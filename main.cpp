@@ -3,6 +3,8 @@
 
 #include <vector>
 #include <iostream>
+#include <thread>         // std::this_thread::sleep_for
+#include <chrono>         // std::chrono::seconds
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -15,111 +17,144 @@ using namespace std;
 
 vector <char> chars;
 
-int main()
-{
+void plot(int x, int y, char c) {
+    mvaddch(y,x,c);
+}
 
-    /*initscr();			/* Start curses mode 		  *
-    chars.push_back(' ');
-    chars.push_back('.');
-    chars.push_back(':');
-    chars.push_back('*');
-    chars.push_back('%');
-    chars.push_back('#');
-    for (int i = 0; i < 50; ++i) {
-        for (int j = 0; j < 100; ++j) {
-            int r = rand()%chars.size();
-            //mvaddch(i,j, chars[r]);
-            //mvaddch(i,10-i,'#');
+void ascii_line(glm::vec2 p1, glm::vec2 p2) {
+
+    int x1 = int(p1.x), y1 = int(p1.y);
+    int x2 = int(p2.x), y2 = int(p2.y);
+
+    int delta_x(x2 - x1);
+    // if x1 == x2, then it does not matter what we set here
+    signed char const ix((delta_x > 0) - (delta_x < 0));
+    delta_x = std::abs(delta_x) << 1;
+
+    int delta_y(y2 - y1);
+    // if y1 == y2, then it does not matter what we set here
+    signed char const iy((delta_y > 0) - (delta_y < 0));
+    delta_y = std::abs(delta_y) << 1;
+
+    plot(x1, y1,'*');
+
+    if (delta_x >= delta_y)
+    {
+        // error may go below zero
+        int error(delta_y - (delta_x >> 1));
+
+        while (x1 != x2)
+        {
+            if ((error >= 0) && (error || (ix > 0)))
+            {
+                error -= delta_x;
+                y1 += iy;
+            }
+            // else do nothing
+
+            error += delta_y;
+            x1 += ix;
+
+            plot(x1, y1, '*');
         }
     }
+    else
+    {
+        // error may go below zero
+        int error(delta_x - (delta_y >> 1));
 
-    int mx,my;
-    getmaxyx(stdscr, mx, my);
-
-    move(mx/2,my/2);
-    addch('#');
-    //printw("Hola Bictor!");	/* Print Hello World		  *
-    refresh();			/* Print it on to the real screen *
-    getch();			/* Wait for user input *
-    endwin();			/* End curses mode		  *
-    */
-    // create the window
-        const int WINDOW_WIDTH = 800, WINDOW_HEIGHT = 600;
-        sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "Mscratchpad");
-
-
-//        // define the position of the triangle's points
-//        triangle[0].position = sf::Vector2f(10, 10);
-//        triangle[1].position = sf::Vector2f(100, 10);
-//        triangle[2].position = sf::Vector2f(100, 100);
-
-//        // define the color of the triangle's points
-//        triangle[0].color = sf::Color::Red;
-//        triangle[1].color = sf::Color::Blue;
-//        triangle[2].color = sf::Color::Green;
-
-        float rotation = 0.0f;
-
-        // run the program as long as the window is open
-        while (window.isOpen())
+        while (y1 != y2)
         {
-            // check all the window's events that were triggered since the last iteration of the loop
-            sf::Event event;
-            while (window.pollEvent(event))
+            if ((error >= 0) && (error || (iy > 0)))
             {
-                // "close requested" event: we close the window
-                if (event.type == sf::Event::Closed )
-                    window.close();
+                error -= delta_y;
+                x1 += ix;
             }
+            // else do nothing
 
-            sf::VertexArray sfmlTriangle(sf::Triangles, 3);
+            error += delta_x;
+            y1 += iy;
 
-            vector <glm::vec4> triangle(3);
-            triangle[0] = glm::vec4( 0.0, 0.0, -10.0, 1.0);
-            triangle[1] = glm::vec4( 2.0, 0.0, -10.0, 1.0);
-            triangle[2] = glm::vec4( 0.0, 2.5, -10.0, 1.0);
-
-
-            glm::mat4 P = glm::perspective(M_PI/2.0, double(WINDOW_WIDTH)/double(WINDOW_HEIGHT), 2.0, 20.0);
-
-            rotation += 0.002;
-            glm::mat4 M = glm::rotate(glm::mat4(1.0),rotation,glm::vec3(0,1,0));
-            for (auto vertex : triangle) {
-                vertex.y *= -1.0;
-                vertex = P*M*vertex;
-                float w = vertex.w;
+            plot(x1, y1, '*');
+        }
+    }
+}
 
 
-                cout << vertex.x << " " << vertex.y << " " << vertex.z << " " << w  << endl;
-                if (vertex.x >= -w && vertex.x <= w &&
-                        vertex.y >= -w && vertex.y <= w &&
-                        vertex.z >= -w && vertex.z <= w) {
-                    vertex /= vertex.w;
-                    vertex *= 0.5f;
-                    vertex += 0.5f;
+int main()
+{
+    initscr();
+    int WINDOW_WIDTH = getmaxx(stdscr), WINDOW_HEIGHT = getmaxy(stdscr);
+
+    float rotation = 0.0f;
+    glm::mat4 P = glm::perspective(M_PI/2.0, double(WINDOW_WIDTH)/double(WINDOW_HEIGHT), 2.0, 20.0);
+    while (true)
+    {
+        double height = 2.5, size = 2.5;
+        vector <glm::vec4> triangle(12);
+        triangle[0] = glm::vec4( -size, 0, -size, 1.0);
+        triangle[1] = glm::vec4( -size, 0, -size, 1.0);
+        triangle[2] = glm::vec4( 0.0, height, 0, 1.0); //tip
+
+        triangle[3] = glm::vec4( -size, 0, size, 1.0);
+        triangle[4] = glm::vec4( -size, 0, size, 1.0);
+        triangle[5] = triangle[2];
+
+        triangle[6] = glm::vec4( size, 0, -size, 1.0);
+        triangle[7] = glm::vec4( size, 0, -size, 1.0);
+        triangle[8] = triangle[2];
+
+        triangle[9]  = glm::vec4( size, 0, size, 1.0);
+        triangle[10] = glm::vec4( size, 0, size, 1.0);
+        triangle[11] = triangle[2];
+
+        vector<glm::vec2> lines;
+        rotation += 0.15;
+        glm::mat4 M(1.0f);
+        M = glm::translate(M, glm::vec3(0,2,-7));
+        M = glm::rotate(M,rotation,glm::vec3(0,1,0));
+
+        for (int i = 0; i < triangle.size(); ++i)
+        {
+            glm::vec4 vertex = triangle[i];
+            vertex.y *= -1.0;
+            vertex = P*M*vertex;
+            float w = vertex.w;
+
+            if (vertex.x >= -w && vertex.x <= w &&
+                vertex.y >= -w && vertex.y <= w &&
+                vertex.z >= -w && vertex.z <= w)
+            {
+                vertex /= vertex.w;
+                vertex *= 0.5f;
+                vertex += 0.5f;
 
 
-                    vertex.x *= WINDOW_WIDTH;
-                    vertex.y *= WINDOW_HEIGHT;
+                vertex.x *= WINDOW_WIDTH;
+                vertex.y *= WINDOW_HEIGHT;
 
-
-
-
-                    sfmlTriangle.append(sf::Vertex(sf::Vector2f(vertex.x,vertex.y)));
-                } else {
-                    cout << "clipped" << endl;
-                }
+                lines.push_back(glm::vec2(vertex.x,vertex.y));
+                //sfmlTriangle.append(sf::Vertex(sf::Vector2f(vertex.x,vertex.y)));
+            } else {
+                //cout << "clipped" << endl;
             }
-
-            // clear the window with black color
-            window.clear(sf::Color::Black);
-
-            // draw everything here...
-            window.draw(sfmlTriangle);
-            // end the current frame
-            window.display();
         }
 
-        return 0;
+        clear();
+        if (lines.size() > 1) {
+            for (int i = 0; i < lines.size(); i+=3)
+            {
+                ascii_line(lines[i],  lines[i+1]);
+                ascii_line(lines[i+1],lines[i+2]);
+                ascii_line(lines[i+2],  lines[i]);
+                //mvprintw(i,0,"%d ->  %d, %d,    %d,%d", i, p0.x,p0.y, p1.x,p1.y);
+            }
+        }
+        move(0,0);
+        refresh();
+        std::this_thread::sleep_for (std::chrono::milliseconds(30));
+    }
+    getch();			/* Wait for user input */
+    endwin();			/* End curses mode		  */
 }
 
