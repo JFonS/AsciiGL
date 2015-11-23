@@ -6,12 +6,8 @@
 #include <thread>         // std::this_thread::sleep_for
 #include <chrono>         // std::chrono::seconds
 
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-
-#include <SFML/System.hpp>
-#include <SFML/Window.hpp>
-#include <SFML/Graphics.hpp>
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
 
 using namespace std;
 
@@ -60,6 +56,56 @@ static const vector<glm::vec3> cube = {
     glm::vec3(-1.0f, 1.0f, 1.0f),
     glm::vec3(1.0f,-1.0f, 1.0f),
 
+};
+
+static const vector<float> cubeColors = {
+    0.0f,
+    0.0f,
+    0.0f,
+
+    0.0f,
+    0.0f,
+    1.0f,
+
+    0.0f,
+    1.0f,
+    0.0f,
+
+    0.0f,
+    1.0f,
+    1.0f,
+
+    1.0f,
+    0.0f,
+    0.0f,
+
+    1.0f,
+    0.0f,
+    1.0f,
+
+    1.0f,
+    1.0f,
+    0.0f,
+
+    1.0f,
+    1.0f,
+    1.0f,
+
+    1.0f,
+    0.0f,
+    1.0f,
+
+    1.0f,
+    0.0f,
+    0.0f,
+
+    0.0f,
+    1.0f,
+    1.0f,
+
+    0.0f,
+    1.0f,
+    0.0f
 };
 
 const char render_char = '*';
@@ -140,9 +186,9 @@ inline bool pointInTriangle (glm::vec2 pt, glm::vec2 v1, glm::vec2 v2, glm::vec2
 float edgeFunction(const glm::vec2 &a, const glm::vec2 &b, const glm::vec2 &c)
 { return (c.x - a.x) * (b.y - a.y) - (c.y - a.y) * (b.x - a.x); }
 
-char render_chars[] = {' ','.','-',':',';','i','c','x','%','#'};
+char render_chars[] = {'.','-',':',';','i','c','x','%','#'};
 
-void ascii_triangle2(const glm::vec3 v0_3,const glm::vec3 v1_3,const glm::vec3 v2_3)
+void ascii_triangle(const glm::vec3 &v0_3,const glm::vec3 &v1_3,const glm::vec3 &v2_3, float c0, float c1, float c2)
 {
     static int i = 0;
     glm::vec2 v0(v0_3.x, v0_3.y);
@@ -169,10 +215,11 @@ void ascii_triangle2(const glm::vec3 v0_3,const glm::vec3 v1_3,const glm::vec3 v
                 w1 /= area;
                 w2 /= area;
                 float z = w0 * v0_3.z + w1 * v1_3.z + w2 * v2_3.z;
+                float color = w0 * c0 + w1 * c1 + w2 * c2;
                 mvprintw(0,0, "%f,   %f", z, zBuffer[x][y]);
                 if(z < zBuffer[x][y])
                 {
-                    plot(x, y, (render_chars[((i) % sizeof(render_chars))]));
+                    plot(x, y, render_chars[int(round(color*sizeof(render_chars)))]);//(render_chars[((i) % sizeof(render_chars))]));
                     zBuffer[x][y] = z;
                 }
             }
@@ -181,7 +228,7 @@ void ascii_triangle2(const glm::vec3 v0_3,const glm::vec3 v1_3,const glm::vec3 v
     ++i;
 }
 
-void ascii_triangle(glm::vec3 v1_3, glm::vec3 v2_3, glm::vec3 v3_3)
+/*void ascii_triangle(glm::vec3 v1_3, glm::vec3 v2_3, glm::vec3 v3_3)
 {
     glm::vec2 v1(v1_3.x, v1_3.y);
     glm::vec2 v2(v2_3.x, v2_3.y);
@@ -210,7 +257,7 @@ void ascii_triangle(glm::vec3 v1_3, glm::vec3 v2_3, glm::vec3 v3_3)
         }
     }
     ++i;
-}
+}*/
 
 int main()
 {
@@ -240,6 +287,7 @@ int main()
         triangle[11] = triangle[2];
 
         vector<glm::vec3> lines;
+        vector<float> colors;
         rotation += 0.15;
         glm::mat4 M(1.0f);
         M = glm::translate(M, glm::vec3(0,2,-13));
@@ -266,10 +314,12 @@ int main()
                 vertex.y *= WINDOW_HEIGHT;
 
                 lines.push_back(glm::vec3(vertex.x, vertex.y, vertex.z));
+                colors.push_back(cubeColors[i]);
                 //sfmlTriangle.append(sf::Vertex(sf::Vector2f(vertex.x,vertex.y)));
             } else {
                 if (lines.size() > 0)
                     lines.push_back(lines[lines.size()-1]);
+
             }
         }
 
@@ -278,7 +328,7 @@ int main()
         if (lines.size() > 1) {
             for (int i = 0; i < lines.size(); i+=3)
             {
-                ascii_triangle2(lines[i], lines[i+1], lines[i+2]);
+                ascii_triangle(lines[i], lines[i+1], lines[i+2], colors[i], colors[i+1], colors[i+2]);
                 /*
                 ascii_line(lines[i],  lines[i+1]);
                 ascii_line(lines[i+1],lines[i+2]);
