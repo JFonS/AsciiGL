@@ -93,19 +93,19 @@ int main()
         double height = 2.5, size = 2.5;
         vector <glm::vec4> triangle(12);
         triangle[0] = glm::vec4( -size, 0, -size, 1.0);
-        triangle[1] = glm::vec4( -size, 0, -size, 1.0);
+        triangle[1] = glm::vec4(  size, 0, -size, 1.0);
         triangle[2] = glm::vec4( 0.0, height, 0, 1.0); //tip
 
         triangle[3] = glm::vec4( -size, 0, size, 1.0);
-        triangle[4] = glm::vec4( -size, 0, size, 1.0);
+        triangle[4] = glm::vec4(  size, 0, size, 1.0);
         triangle[5] = triangle[2];
 
         triangle[6] = glm::vec4( size, 0, -size, 1.0);
-        triangle[7] = glm::vec4( size, 0, -size, 1.0);
+        triangle[7] = glm::vec4( size, 0,  size, 1.0);
         triangle[8] = triangle[2];
 
-        triangle[9]  = glm::vec4( size, 0, size, 1.0);
-        triangle[10] = glm::vec4( size, 0, size, 1.0);
+        triangle[9]  = glm::vec4( -size, 0, -size, 1.0);
+        triangle[10] = glm::vec4( -size, 0,  size, 1.0);
         triangle[11] = triangle[2];
 
         vector<glm::vec2> lines;
