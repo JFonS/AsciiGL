@@ -72,7 +72,6 @@ void Pipeline::drawTriangle(const glm::vec3 &v0_3,const glm::vec3 &v1_3,const gl
             float w0 = edgeFunction(v1, v2, p);
             float w1 = edgeFunction(v2, v0, p);
             float w2 = edgeFunction(v0, v1, p);
-            //mvprintw(y, x, "%f, %f, %f", w0, w1, w2);
             if (w0 >= 0 && w1 >= 0 && w2 >= 0)
             {
                 w0 /= area;
@@ -80,7 +79,6 @@ void Pipeline::drawTriangle(const glm::vec3 &v0_3,const glm::vec3 &v1_3,const gl
                 w2 /= area;
                 float z = w0 * v0_3.z + w1 * v1_3.z + w2 * v2_3.z;
                 framebuffer.drawChar(glm::vec3(x,y,z), '*');
-                mvprintw(0, 0, "%f, %f, %f", x, y, 0);
             }
         }
     }
@@ -89,26 +87,32 @@ void Pipeline::drawTriangle(const glm::vec3 &v0_3,const glm::vec3 &v1_3,const gl
 float Pipeline::edgeFunction(const glm::vec2 &a, const glm::vec2 &b, const glm::vec2 &c)
 { return (c.x - a.x) * (b.y - a.y) - (c.y - a.y) * (b.x - a.x); }
 
+glm::vec4 Pipeline::applyVertexShader(VAO &vao, int vertex_index) const
+{
+    vao.currentVertexIndex = vertex_index;
+    float rotation = 2.0f;
+    glm::mat4 M(1.0f);
+    glm::mat4 P = glm::perspective(M_PI/2.0, double(300)/500,/*double(framebuffer.getWidth()) / framebuffer.getHeight(),*/ 2.0, 20.0);
+    M = glm::translate(M, glm::vec3(0,2,-13));
+    M = glm::rotate(M,rotation,glm::vec3(1,1,0.3));
+    M = glm::rotate(M,rotation*1.5f,glm::vec3(0.5,0,1));
+    M = glm::scale(M,glm::vec3(4.0));
+    glm::vec4 vertex = glm::vec4(vao.getVec3("position"), 1.0);
 
-void Pipeline::drawVAO(const VAO &vao, Framebuffer &framebuffer) const
+    vertex.y *= -1.0;
+    vertex = glm::scale(glm::mat4(1.0),glm::vec3(1,0.6,1)) * P * M * vertex;
+    return vertex;
+}
+
+
+void Pipeline::drawVAO(VAO &vao, Framebuffer &framebuffer) const
 {
     std::vector<glm::vec3> lines;
     static float rotation = 0.0f;
     rotation += 0.15;
     for (int i = 0; i < vao.vertices.size(); ++i)
     {
-
-        glm::mat4 M(1.0f);
-        glm::mat4 P = glm::perspective(M_PI/2.0, double(framebuffer.getWidth()) / framebuffer.getHeight(), 2.0, 20.0);
-        M = glm::translate(M, glm::vec3(0,2,-13));
-        M = glm::rotate(M,rotation,glm::vec3(1,1,0.3));
-        M = glm::rotate(M,rotation*1.5f,glm::vec3(0.5,0,1));
-        M = glm::scale(M,glm::vec3(4.0));
-
-        glm::vec4 vertex = glm::vec4(vao.vertices[i], 1.0f);
-        vertex.y *= -1.0;
-        vertex = glm::scale(glm::mat4(1.0),glm::vec3(1,0.6,1)) * P * M * vertex;
-
+        glm::vec4 vertex = applyVertexShader(vao,i);
 
         float w = vertex.w;
         if (vertex.x >= -w && vertex.x <= w &&
@@ -134,7 +138,6 @@ void Pipeline::drawVAO(const VAO &vao, Framebuffer &framebuffer) const
     {
         for (int i = 0; i < lines.size(); i+=3)
         {
-
             drawTriangle(lines[i], lines[i+1], lines[i+2], framebuffer);
         }
     }

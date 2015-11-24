@@ -14,12 +14,13 @@ private:
     void  drawTriangle(const glm::vec3 &v0_3, const glm::vec3 &v1_3, const glm::vec3 &v2_3, Framebuffer &framebuffer) const;
 
     static float edgeFunction(const glm::vec2 &a, const glm::vec2 &b, const glm::vec2 &c);
+    glm::vec4 applyVertexShader(VAO &vao, int vertex_index) const;
 
 public:
 
     Pipeline();
 
-    void drawVAO(const VAO &vao, Framebuffer &framebuffer) const;
+    void drawVAO(VAO &vao, Framebuffer &framebuffer) const;
 };
 
 #endif // PIPELINE_H

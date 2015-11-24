@@ -57,7 +57,7 @@ static const vector<glm::vec3> cube = {
 
 };
 
-static const vector<float> cubeColors = {
+std::vector<float> cubeColors = {
     1.0f,
     1.0f,
     1.0f,
@@ -114,17 +114,24 @@ int main()
     Framebuffer fb(getmaxx(stdscr), getmaxy(stdscr));
     Pipeline pl;
     VAO vao;
+    vao.addVBO("position", cube);
     vao.vertices = cube;
+
+    std::string a = "colors";
+    vao.addVBO(a, cubeColors);
+    float color = vao.getFloat(a);
 
     while (true)
     {
+        clear();
         fb.clearChars();
         fb.clearZBuffer();
 
         pl.drawVAO(vao, fb);
+
         fb.render();
 
-        move(0,0);
+        refresh();
         std::this_thread::sleep_for (std::chrono::milliseconds(100));
     }
 
