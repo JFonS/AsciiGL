@@ -17,7 +17,7 @@ void Framebuffer::drawChar(const glm::vec3 &pos, char c)
 
 void Framebuffer::render()
 {
-    //clear();
+    clear();
     for(int x = 0; x < width; ++x)
     {
         for(int y = 0; y < height; ++y)

@@ -116,19 +116,16 @@ int main()
     VAO vao;
     vao.vertices = cube;
 
-    vao.vertices = { glm::vec3(0.1,0.1,0.5), glm::vec3(0.1,0.9,0.5), glm::vec3(0.9, 0.1,0.5) };
-
     while (true)
     {
         fb.clearChars();
         fb.clearZBuffer();
 
-        //pl.drawTriangle(glm::vec3(0,0,6), glm::vec3(0,fb.getHeight(),6), glm::vec3(fb.getWidth(), 0, 6), fb);
         pl.drawVAO(vao, fb);
         fb.render();
 
         move(0,0);
-        std::this_thread::sleep_for (std::chrono::milliseconds(2000));
+        std::this_thread::sleep_for (std::chrono::milliseconds(100));
     }
 
     getch();
