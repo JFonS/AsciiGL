@@ -115,20 +115,33 @@ int main()
     Pipeline pl;
     VAO vao;
     vao.addVBO("position", cube);
-    vao.vertices = cube;
 
     std::string a = "colors";
     vao.addVBO(a, cubeColors);
-    float color = vao.getFloat(a);
+
+    float rotation = 0.0f;
+
+    glm::mat4 P = glm::perspective(M_PI/2.0, double(fb.getWidth()) / fb.getHeight(), 2.0, 20.0);
+
+    vao.setMat4("project", P);
 
     while (true)
     {
         clear();
+
         fb.clearChars();
         fb.clearZBuffer();
 
-        pl.drawVAO(vao, fb);
+        rotation += 0.2f;
+        glm::mat4 M(1.0f);
+        M = glm::translate(M, glm::vec3(0,2,-13));
+        M = glm::rotate(M,rotation,glm::vec3(1,1,0.3));
+        M = glm::rotate(M,rotation*1.5f,glm::vec3(0.5,0,1));
+        M = glm::scale(M,glm::vec3(4.0));
 
+        vao.setMat4("model", M);
+
+        pl.drawVAO(vao, fb);
         fb.render();
 
         refresh();

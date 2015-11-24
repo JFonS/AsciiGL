@@ -4,7 +4,7 @@ Pipeline::Pipeline()
 {
 }
 
-void Pipeline::drawLine(const glm::vec2 &p1, const glm::vec2 &p2, Framebuffer &framebuffer) const
+void Pipeline::drawLine(const glm::vec2 &p1, const glm::vec2 &p2, VAO &vao, Framebuffer &framebuffer) const
 {
     int x1 = round(p1.x), y1 = round(p1.y);
     int x2 = round(p2.x), y2 = round(p2.y);
@@ -51,7 +51,7 @@ void Pipeline::drawLine(const glm::vec2 &p1, const glm::vec2 &p2, Framebuffer &f
     }
 }
 
-void Pipeline::drawTriangle(const glm::vec3 &v0_3,const glm::vec3 &v1_3,const glm::vec3 &v2_3, Framebuffer &framebuffer) const
+void Pipeline::drawTriangle(const glm::vec3 &v0_3,const glm::vec3 &v1_3,const glm::vec3 &v2_3, VAO &vao, Framebuffer &framebuffer) const
 {
 
     glm::vec2 v0(v0_3.x, v0_3.y);
@@ -78,7 +78,9 @@ void Pipeline::drawTriangle(const glm::vec3 &v0_3,const glm::vec3 &v1_3,const gl
                 w1 /= area;
                 w2 /= area;
                 float z = w0 * v0_3.z + w1 * v1_3.z + w2 * v2_3.z;
-                framebuffer.drawChar(glm::vec3(x,y,z), '*');
+                glm::vec3 fragment(x,y,z);
+                //char c = applyCharShader(vao, fragment);
+                framebuffer.drawChar(fragment, '*');
             }
         }
     }
@@ -90,18 +92,19 @@ float Pipeline::edgeFunction(const glm::vec2 &a, const glm::vec2 &b, const glm::
 glm::vec4 Pipeline::applyVertexShader(VAO &vao, int vertex_index) const
 {
     vao.currentVertexIndex = vertex_index;
-    float rotation = 2.0f;
-    glm::mat4 M(1.0f);
-    glm::mat4 P = glm::perspective(M_PI/2.0, double(300)/500,/*double(framebuffer.getWidth()) / framebuffer.getHeight(),*/ 2.0, 20.0);
-    M = glm::translate(M, glm::vec3(0,2,-13));
-    M = glm::rotate(M,rotation,glm::vec3(1,1,0.3));
-    M = glm::rotate(M,rotation*1.5f,glm::vec3(0.5,0,1));
-    M = glm::scale(M,glm::vec3(4.0));
+
+    glm::mat4 P = vao.getMat4("project");
+    glm::mat4 M = vao.getMat4("model");
     glm::vec4 vertex = glm::vec4(vao.getVec3("position"), 1.0);
 
     vertex.y *= -1.0;
     vertex = glm::scale(glm::mat4(1.0),glm::vec3(1,0.6,1)) * P * M * vertex;
     return vertex;
+}
+
+char Pipeline::applyCharShader(VAO &vao, const glm::vec3 &fragment) const
+{
+    return '*';
 }
 
 
@@ -110,7 +113,7 @@ void Pipeline::drawVAO(VAO &vao, Framebuffer &framebuffer) const
     std::vector<glm::vec3> lines;
     static float rotation = 0.0f;
     rotation += 0.15;
-    for (int i = 0; i < vao.vertices.size(); ++i)
+    for (int i = 0; i < vao.size(); ++i)
     {
         glm::vec4 vertex = applyVertexShader(vao,i);
 
@@ -138,7 +141,10 @@ void Pipeline::drawVAO(VAO &vao, Framebuffer &framebuffer) const
     {
         for (int i = 0; i < lines.size(); i+=3)
         {
-            drawTriangle(lines[i], lines[i+1], lines[i+2], framebuffer);
+            //drawLine(glm::vec2(lines[i]),glm::vec2(lines[i+1]), framebuffer);
+            //drawLine(glm::vec2(lines[i+1]),glm::vec2(lines[i+2]), framebuffer);
+            //drawLine(glm::vec2(lines[i]),glm::vec2(lines[i+2]), framebuffer);
+            drawTriangle(lines[i], lines[i+1], lines[i+2], vao, framebuffer);
         }
     }
 }

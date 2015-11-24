@@ -10,11 +10,12 @@
 class Pipeline
 {
 private:
-    void  drawLine(const glm::vec2 &p1, const glm::vec2 &p2, Framebuffer &framebuffer) const;
-    void  drawTriangle(const glm::vec3 &v0_3, const glm::vec3 &v1_3, const glm::vec3 &v2_3, Framebuffer &framebuffer) const;
+    void  drawLine(const glm::vec2 &p1, const glm::vec2 &p2, VAO &vao, Framebuffer &framebuffer) const;
+    void  drawTriangle(const glm::vec3 &v0_3, const glm::vec3 &v1_3, const glm::vec3 &v2_3, VAO &vao, Framebuffer &framebuffer) const;
 
     static float edgeFunction(const glm::vec2 &a, const glm::vec2 &b, const glm::vec2 &c);
     glm::vec4 applyVertexShader(VAO &vao, int vertex_index) const;
+    char applyCharShader(VAO &vao, const glm::vec3 &fragment) const;
 
 public:
 
