@@ -17,13 +17,13 @@ public:
     Framebuffer(int width, int height);
 
     void drawChar(const glm::vec3 &pos, char c);
-    void render();
+    void render() const;
 
     void clearChars();
     void clearZBuffer();
 
-    int getWidth() { return width; }
-    int getHeight() { return height; }
+    int getWidth() const { return width; }
+    int getHeight() const { return height; }
 };
 
 #endif // FRAMEBUFFER_H

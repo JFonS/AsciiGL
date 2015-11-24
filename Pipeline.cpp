@@ -4,7 +4,7 @@ Pipeline::Pipeline()
 {
 }
 
-void Pipeline::drawLine(const glm::vec2 &p1, const glm::vec2 &p2, Framebuffer &framebuffer)
+void Pipeline::drawLine(const glm::vec2 &p1, const glm::vec2 &p2, Framebuffer &framebuffer) const
 {
     int x1 = round(p1.x), y1 = round(p1.y);
     int x2 = round(p2.x), y2 = round(p2.y);
@@ -51,7 +51,7 @@ void Pipeline::drawLine(const glm::vec2 &p1, const glm::vec2 &p2, Framebuffer &f
     }
 }
 
-void Pipeline::drawTriangle(const glm::vec3 &v0_3,const glm::vec3 &v1_3,const glm::vec3 &v2_3, Framebuffer &framebuffer)
+void Pipeline::drawTriangle(const glm::vec3 &v0_3,const glm::vec3 &v1_3,const glm::vec3 &v2_3, Framebuffer &framebuffer) const
 {
 
     glm::vec2 v0(v0_3.x, v0_3.y);
@@ -90,7 +90,7 @@ float Pipeline::edgeFunction(const glm::vec2 &a, const glm::vec2 &b, const glm::
 { return (c.x - a.x) * (b.y - a.y) - (c.y - a.y) * (b.x - a.x); }
 
 
-void Pipeline::drawVAO(const VAO &vao, Framebuffer &framebuffer)
+void Pipeline::drawVAO(const VAO &vao, Framebuffer &framebuffer) const
 {
     std::vector<glm::vec3> lines;
     static float rotation = 0.0f;
