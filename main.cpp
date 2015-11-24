@@ -59,29 +59,29 @@ static const vector<glm::vec3> cube = {
 };
 
 static const vector<float> cubeColors = {
-    0.0f,
-    0.0f,
-    0.0f,
-
-    0.0f,
-    0.0f,
     1.0f,
-
-    0.0f,
-    1.0f,
-    0.0f,
-
-    0.0f,
     1.0f,
     1.0f,
 
     1.0f,
-    0.0f,
-    0.0f,
+    1.0f,
+    1.0f,
 
     1.0f,
-    0.0f,
     1.0f,
+    1.0f,
+
+    0.2f,
+    0.2f,
+    0.2f,
+
+    0.8f,
+    0.8f,
+    0.8f,
+
+    0.8f,
+    0.8f,
+    0.8f,
 
     1.0f,
     1.0f,
@@ -116,6 +116,7 @@ void ascii_line(glm::vec2 p1, glm::vec2 p2) {
     int x2 = round(p2.x), y2 = round(p2.y);
 
     int delta_x(x2 - x1);
+
     // if x1 == x2, then it does not matter what we set here
     signed char const ix((delta_x > 0) - (delta_x < 0));
     delta_x = std::abs(delta_x) << 1;
@@ -170,7 +171,7 @@ void ascii_line(glm::vec2 p1, glm::vec2 p2) {
 }
 
 
-inline float sign (glm::vec2 p1, glm::vec2 p2, glm::vec2 p3)
+/*inline float sign (glm::vec2 p1, glm::vec2 p2, glm::vec2 p3)
 {
     return (p1.x - p3.x) * (p2.y - p3.y) - (p2.x - p3.x) * (p1.y - p3.y);
 }
@@ -181,12 +182,12 @@ inline bool pointInTriangle (glm::vec2 pt, glm::vec2 v1, glm::vec2 v2, glm::vec2
     bool b2 = sign(pt, v2, v3) < 0.0f;
     bool b3 = sign(pt, v3, v1) < 0.0f;
     return ((b1 == b2) && (b2 == b3));
-}
+}*/
+
+char render_chars[] = {'.','-',':',';','i','c','x','%','#'};
 
 float edgeFunction(const glm::vec2 &a, const glm::vec2 &b, const glm::vec2 &c)
 { return (c.x - a.x) * (b.y - a.y) - (c.y - a.y) * (b.x - a.x); }
-
-char render_chars[] = {'.','-',':',';','i','c','x','%','#'};
 
 void ascii_triangle(const glm::vec3 &v0_3,const glm::vec3 &v1_3,const glm::vec3 &v2_3, float c0, float c1, float c2)
 {
@@ -291,7 +292,8 @@ int main()
         rotation += 0.15;
         glm::mat4 M(1.0f);
         M = glm::translate(M, glm::vec3(0,2,-13));
-        M = glm::rotate(M,rotation,glm::vec3(0,1,0));
+        M = glm::rotate(M,rotation,glm::vec3(1,1,0.3));
+        M = glm::rotate(M,rotation*1.5f,glm::vec3(0.5,0,1));
         M = glm::scale(M,glm::vec3(4.0));
 
         for (int i = 0; i < cube.size(); ++i)
