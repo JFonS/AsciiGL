@@ -10,5 +10,13 @@ LIBS += -lncurses \
 
 
 
-SOURCES += main.cpp
+SOURCES += main.cpp \
+    Framebuffer.cpp \
+    Pipeline.cpp \
+    VAO.cpp
+
+HEADERS += \
+    Framebuffer.h \
+    Pipeline.h \
+    VAO.h
 
