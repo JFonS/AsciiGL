@@ -17,12 +17,12 @@ void Framebuffer::drawChar(const glm::vec3 &pos, char c)
 
 void Framebuffer::render()
 {
-    clear();
+    //clear();
     for(int x = 0; x < width; ++x)
     {
         for(int y = 0; y < height; ++y)
         {
-           if(chars[x][y] != ' ') mvaddch(y, x, chars[x][y]);
+            if(chars[x][y] != ' ') mvaddch(y, x, chars[x][y]);
         }
     }
     refresh();

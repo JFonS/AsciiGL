@@ -58,7 +58,6 @@ void Pipeline::drawTriangle(const glm::vec3 &v0_3,const glm::vec3 &v1_3,const gl
     glm::vec2 v2(v2_3.x, v2_3.y);
 
     float area = edgeFunction(v0, v1, v2);
-
     float minX = std::min(v0.x, std::min(v1.x, v2.x));
     float maxX = std::max(v0.x, std::max(v1.x, v2.x));
     float minY = std::min(v0.y, std::min(v1.y, v2.y));
@@ -72,12 +71,15 @@ void Pipeline::drawTriangle(const glm::vec3 &v0_3,const glm::vec3 &v1_3,const gl
             float w0 = edgeFunction(v1, v2, p);
             float w1 = edgeFunction(v2, v0, p);
             float w2 = edgeFunction(v0, v1, p);
-            if (w0 >= 0 && w1 >= 0 && w2 >= 0) {
+            mvprintw(0, 0, "%f, %f, %f", w0, w1, w2);
+            if (w0 >= 0 && w1 >= 0 && w2 >= 0)
+            {
                 w0 /= area;
                 w1 /= area;
                 w2 /= area;
                 float z = w0 * v0_3.z + w1 * v1_3.z + w2 * v2_3.z;
                 framebuffer.drawChar(glm::vec3(x,y,z), '*');
+                mvprintw(0, 0, "%f, %f, %f", x, y, 0);
             }
         }
     }
@@ -92,8 +94,8 @@ void Pipeline::drawVAO(const VAO &vao, Framebuffer &framebuffer)
     std::vector<glm::vec3> lines;
     for (int i = 0; i < vao.vertices.size(); ++i)
     {
-        static float rotation = 0.0f;
-        rotation += 0.15;
+        static float rotation = 0.0f; rotation += 0.15;
+
         glm::mat4 M(1.0f);
         glm::mat4 P = glm::perspective(M_PI/2.0, double(framebuffer.getWidth()) / framebuffer.getHeight(), 2.0, 20.0);
         M = glm::translate(M, glm::vec3(0,2,-13));
@@ -103,7 +105,8 @@ void Pipeline::drawVAO(const VAO &vao, Framebuffer &framebuffer)
 
         glm::vec4 vertex = glm::vec4(vao.vertices[i], 1.0f);
         vertex.y *= -1.0;
-        vertex = glm::scale(glm::mat4(1.0),glm::vec3(1,0.6,1))*P*M*vertex;
+        vertex = /*glm::scale(glm::mat4(1.0),glm::vec3(1,0.6,1)) * P * M **/ vertex;
+
 
         float w = vertex.w;
         if (vertex.x >= -w && vertex.x <= w &&
@@ -129,6 +132,7 @@ void Pipeline::drawVAO(const VAO &vao, Framebuffer &framebuffer)
     {
         for (int i = 0; i < lines.size(); i+=3)
         {
+
             drawTriangle(lines[i], lines[i+1], lines[i+2], framebuffer);
         }
     }
