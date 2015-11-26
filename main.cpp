@@ -58,54 +58,68 @@ static const vector<glm::vec3> cube = {
 };
 
 std::vector<float> cubeColors = {
-    1.0f,
-    1.0f,
-    1.0f,
-
-    1.0f,
+    1.0f,//A
     1.0f,
     1.0f,
 
-    1.0f,
+    0.3f,//B
+    0.3f,
+    0.3f,
+
+    0.7f,//C
+    0.7f,
+    0.7f,
+
+    0.3f,//B
+    0.3f,
+    0.3f,
+
+    1.0f,//A
     1.0f,
     1.0f,
 
+    0.7f,//C
+    0.7f,
+    0.7f,
+
+    0.2f,//D
     0.2f,
     0.2f,
+
+    0.8f,//E
+    0.8f,
+    0.8f,
+
+    0.8f,//E
+    0.8f,
+    0.8f,
+
+    0.4f,//F
+    0.4f,
+    0.4f,
+
+    0.4f,//F
+    0.4f,
+    0.4f,
+
+    0.2f,//D
     0.2f,
-
-    0.8f,
-    0.8f,
-    0.8f,
-
-    0.8f,
-    0.8f,
-    0.8f,
-
-    1.0f,
-    1.0f,
-    0.0f,
-
-    1.0f,
-    1.0f,
-    1.0f,
-
-    1.0f,
-    0.0f,
-    1.0f,
-
-    1.0f,
-    0.0f,
-    0.0f,
-
-    0.0f,
-    1.0f,
-    1.0f,
-
-    0.0f,
-    1.0f,
-    0.0f
+    0.2f
 };
+
+glm::vec4 vshader(const GenericMap &vertexAttributes, const GenericMap &uniforms, GenericMap &fragmentAttributes)
+{
+    glm::vec3 v = vertexAttributes.getVec3("position");
+
+    fragmentAttributes.set("color", vertexAttributes.getFloat("color"));
+
+    return  glm::scale(glm::mat4(1.0f), glm::vec3(1,0.6,1))  * uniforms.getMat4("P") * uniforms.getMat4("M") * glm::vec4(v, 1.0f);
+}
+
+glm::vec4 fshader(const GenericMap &fragmentAttributes, const GenericMap &uniforms)
+{
+    return glm::vec4(glm::vec3(fragmentAttributes.getFloat("color")), 1.0f);
+}
 
 int main()
 {
@@ -113,17 +127,17 @@ int main()
 
     Framebuffer fb(getmaxx(stdscr), getmaxy(stdscr));
     Pipeline pl;
+    pl.program.fragmentShader = fshader;
+    pl.program.vertexShader = vshader;
+
     VAO vao;
     vao.addVBO("position", cube);
-
-    std::string a = "colors";
-    vao.addVBO(a, cubeColors);
+    vao.addVBO("color", cubeColors);
 
     float rotation = 0.0f;
 
     glm::mat4 P = glm::perspective(M_PI/2.0, double(fb.getWidth()) / fb.getHeight(), 2.0, 20.0);
-
-    //vao.setMat4("project", P);
+    pl.program.uniforms.set("P", P);
 
     while (true)
     {
@@ -139,7 +153,7 @@ int main()
         M = glm::rotate(M,rotation*1.5f,glm::vec3(0.5,0,1));
         M = glm::scale(M,glm::vec3(4.0));
 
-        //vao.setMat4("model", M);
+        pl.program.uniforms.set("M", M);
 
         pl.drawVAO(vao, fb);
         fb.render();

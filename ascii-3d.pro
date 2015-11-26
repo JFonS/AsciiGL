@@ -4,12 +4,7 @@ QMAKE_CXXFLAGS += -std=c++11
 CONFIG -= app_bundle
 CONFIG -= qt
 
-LIBS += -lncurses \
-        -lsfml-graphics \
-        -lsfml-system \
-        -lsfml-window
-
-
+LIBS += -lncurses
 
 SOURCES += main.cpp \
     Framebuffer.cpp \

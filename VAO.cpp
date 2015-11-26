@@ -3,8 +3,3 @@
 VAO::VAO()
 {
 }
-
-int VAO::size()
-{
-    return VBOsize;
-}

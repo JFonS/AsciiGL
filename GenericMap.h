@@ -2,6 +2,8 @@
 #define GENERICMAP_H
 
 #include <map>
+#include <vector>
+#include <iostream>
 
 #include "glm/glm.hpp"
 

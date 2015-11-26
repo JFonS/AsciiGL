@@ -22,7 +22,6 @@ private:
 public:
 
     VAO();
-    int size();
 
     //TO DO check if adding VBOs of different size
     template<class T>

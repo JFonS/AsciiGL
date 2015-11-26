@@ -52,7 +52,7 @@ void Pipeline::drawLine(const glm::vec2 &p1, const glm::vec2 &p2, VAO &vao, Fram
 }
 
 void Pipeline::drawTriangle(const glm::vec3 &v0_3,const glm::vec3 &v1_3,const glm::vec3 &v2_3,
-                            const std::vector<GenericMap> &vertexAttributes,
+                            const std::vector<GenericMap> &triangleVertexAttributes,
                             Framebuffer &framebuffer) const
 {
     glm::vec2 v0(v0_3.x, v0_3.y);
@@ -79,8 +79,10 @@ void Pipeline::drawTriangle(const glm::vec3 &v0_3,const glm::vec3 &v1_3,const gl
                 float z = w0 * v0_3.z + w1 * v1_3.z + w2 * v2_3.z;
                 glm::vec3 fragmentPos(x,y,z);
 
-                glm::vec4 color = applyFragmentShader(vertexAttributes, glm::vec3(w0, w1, w2),  fragmentPos);
-                framebuffer.drawChar(fragmentPos, '*');
+                const char render_chars[] = {'`','-',':',';','i','c','x','%','#', '#'};
+                glm::vec4 color = applyFragmentShader(triangleVertexAttributes, glm::vec3(w0, w1, w2),  fragmentPos);
+                char c = render_chars[ int(color.x * 9 + 0.5) ];
+                framebuffer.drawChar(fragmentPos, c);
             }
         }
     }
@@ -91,9 +93,11 @@ float Pipeline::edgeFunction(const glm::vec2 &a, const glm::vec2 &b, const glm::
 
 
 
-glm::vec4 Pipeline::applyVertexShader(GenericMap &vertexAttributes, int vertex_index) const
+glm::vec4 Pipeline::applyVertexShader(const GenericMap &vertexAttributes, int vertex_index) const
 {
-    glm::vec4 vertex = program.vertexShader(vertexAttributes, program.uniforms);
+    GenericMap fragmentAttributes_i; //Empty, to be filled in the vertexShader
+    glm::vec4 vertex = program.vertexShader(vertexAttributes, program.uniforms, fragmentAttributes_i);
+    fragmentAttributes[vertex_index] = fragmentAttributes_i;
     vertex.y *= -1.0;
     return vertex;
 }
@@ -106,19 +110,16 @@ glm::vec4 Pipeline::applyFragmentShader(const std::vector<GenericMap> &vertexAtt
     return program.fragmentShader(fragmentAttributes, program.uniforms);
 }
 
-
-
-
 void Pipeline::drawVAO(VAO &vao, Framebuffer &framebuffer) const
 {
-    GenericMap copiedVertexAttributes = vao.vertexAttributes;
+    fragmentAttributes = std::vector<GenericMap>(vao.vertexAttributes.size()); //clear it
 
     std::vector<glm::vec3> vertices;
     static float rotation = 0.0f;
     rotation += 0.15;
-    for (int i = 0; i < vao.size(); ++i)
+    for (int i = 0; i < vao.vertexAttributes.size(); ++i)
     {
-        glm::vec4 vertex = applyVertexShader(copiedVertexAttributes, i);
+        glm::vec4 vertex = applyVertexShader(vao.vertexAttributes[i], i);
 
         //Clip it
         float w = vertex.w;
@@ -139,7 +140,7 @@ void Pipeline::drawVAO(VAO &vao, Framebuffer &framebuffer) const
         }
         else //Provisional clip treatment
         {
-            if (vertices.size() > 0) vertices.push_back(lines[lines.size()-1]);
+            if (vertices.size() > 0) vertices.push_back(vertices[vertices.size()-1]);
         }
     }
 
@@ -150,7 +151,13 @@ void Pipeline::drawVAO(VAO &vao, Framebuffer &framebuffer) const
             //drawLine(glm::vec2(lines[i]),glm::vec2(lines[i+1]), framebuffer);
             //drawLine(glm::vec2(lines[i+1]),glm::vec2(lines[i+2]), framebuffer);
             //drawLine(glm::vec2(lines[i]),glm::vec2(lines[i+2]), framebuffer);
-            drawTriangle(vertices[i], vertices[i+1], vertices[i+2], vao, framebuffer);
+            std::vector<GenericMap> triangleVertexAttributes;
+            triangleVertexAttributes = { fragmentAttributes[i],
+                                         fragmentAttributes[i+1],
+                                         fragmentAttributes[i+2]
+                                       };
+
+            drawTriangle(vertices[i], vertices[i+1], vertices[i+2], triangleVertexAttributes, framebuffer);
         }
     }
 }

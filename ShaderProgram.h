@@ -10,8 +10,8 @@ class ShaderProgram
 public:
     GenericMap uniforms;
 
-    std::function<glm::vec4(GenericMap &vertexAttributes, GenericMap &uniforms)> vertexShader;
-    std::function<glm::vec4(const GenericMap &fragmentAttributes, GenericMap &uniforms)> fragmentShader;
+    std::function<glm::vec4 (const GenericMap&, const GenericMap&, GenericMap&)> vertexShader;
+    std::function<glm::vec4 (const GenericMap&, const GenericMap&)> fragmentShader;
 
     ShaderProgram();
 };
