@@ -21,7 +21,7 @@ private:
     static float edgeFunction(const glm::vec2 &a, const glm::vec2 &b, const glm::vec2 &c);
 
     glm::vec4 applyVertexShader(GenericMap &vertexAttributes, int vertex_index) const;
-    glm::vec4 applyFragmentShader(const std::vector<GenericMap> &vertexAttributes, const glm::vec3 &ws) const;
+    glm::vec4 applyFragmentShader(const std::vector<GenericMap> &vertexAttributes, const glm::vec3 &ws,  const glm::vec3 fragmentPos) const;
 
 public:
 

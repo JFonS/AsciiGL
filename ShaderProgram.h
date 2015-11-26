@@ -3,6 +3,7 @@
 
 #include "VAO.h"
 #include "GenericMap.h"
+#include <functional>
 
 class ShaderProgram
 {

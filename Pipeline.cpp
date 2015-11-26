@@ -79,8 +79,8 @@ void Pipeline::drawTriangle(const glm::vec3 &v0_3,const glm::vec3 &v1_3,const gl
                 float z = w0 * v0_3.z + w1 * v1_3.z + w2 * v2_3.z;
                 glm::vec3 fragmentPos(x,y,z);
 
-                glm::vec4 color = applyFragmentShader(vertexAttributes, fragmentPos, glm::vec3(w0, w1, w2));
-                framebuffer.drawChar(fragment, '*');
+                glm::vec4 color = applyFragmentShader(vertexAttributes, glm::vec3(w0, w1, w2),  fragmentPos);
+                framebuffer.drawChar(fragmentPos, '*');
             }
         }
     }
@@ -93,15 +93,16 @@ float Pipeline::edgeFunction(const glm::vec2 &a, const glm::vec2 &b, const glm::
 
 glm::vec4 Pipeline::applyVertexShader(GenericMap &vertexAttributes, int vertex_index) const
 {
-    glm::vec4 vertex = program.vertexShader(vao.vertexAttributes[vertex_index], program.uniforms);
+    glm::vec4 vertex = program.vertexShader(vertexAttributes, program.uniforms);
     vertex.y *= -1.0;
     return vertex;
 }
 
-glm::vec4 Pipeline::applyFragmentShader(const std::vector<GenericMap> &vertexAttributes, const glm::vec3 &ws) const
+glm::vec4 Pipeline::applyFragmentShader(const std::vector<GenericMap> &vertexAttributes, const glm::vec3 &ws,  const glm::vec3 fragmentPos) const
 {
     GenericMap fragmentAttributes;
     GenericMap::interpolateTriangle(vertexAttributes, ws, fragmentAttributes);
+    fragmentAttributes.set("fragmentPos", fragmentPos);
     return program.fragmentShader(fragmentAttributes, program.uniforms);
 }
 

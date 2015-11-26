@@ -1,5 +1,6 @@
 TEMPLATE = app
 CONFIG += console c++11
+QMAKE_CXXFLAGS += -std=c++11
 CONFIG -= app_bundle
 CONFIG -= qt
 
@@ -15,9 +16,7 @@ SOURCES += main.cpp \
     Pipeline.cpp \
     VAO.cpp \
     ShaderProgram.cpp \
-    GenericMap.cpp \
-    FragmentShader.cpp \
-    VertexShader.cpp
+    GenericMap.cpp 
 
 HEADERS += \
     Framebuffer.h \
@@ -25,6 +24,4 @@ HEADERS += \
     VAO.h \
     ShaderProgram.h \
     GenericMap.h \
-    FragmentShader.h \
-    VertexShader.h
 
