@@ -6,6 +6,8 @@ Pipeline::Pipeline()
 
 void Pipeline::drawLine(const glm::vec2 &p1, const glm::vec2 &p2, VAO &vao, Framebuffer &framebuffer) const
 {
+    //TO DO: fragment shader
+    glm::vec4 color(1.0f);
     int x1 = round(p1.x), y1 = round(p1.y);
     int x2 = round(p2.x), y2 = round(p2.y);
 
@@ -17,7 +19,7 @@ void Pipeline::drawLine(const glm::vec2 &p1, const glm::vec2 &p2, VAO &vao, Fram
     signed char const iy((delta_y > 0) - (delta_y < 0));
     delta_y = std::abs(delta_y) / 2;
 
-    framebuffer.drawChar(glm::vec3(x1, y1, 0), '*');
+    framebuffer.drawChar(glm::vec3(x1, y1, 0), '*', color);
 
     if (delta_x >= delta_y)
     {
@@ -31,7 +33,7 @@ void Pipeline::drawLine(const glm::vec2 &p1, const glm::vec2 &p2, VAO &vao, Fram
             }
             error += delta_y;
             x1 += ix;
-            framebuffer.drawChar(glm::vec3(x1, y1, 0), '*');
+            framebuffer.drawChar(glm::vec3(x1, y1, 0), '*', color);
         }
     }
     else
@@ -46,7 +48,7 @@ void Pipeline::drawLine(const glm::vec2 &p1, const glm::vec2 &p2, VAO &vao, Fram
             }
             error += delta_x;
             y1 += iy;
-            framebuffer.drawChar(glm::vec3(x1, y1, 0), '*');
+            framebuffer.drawChar(glm::vec3(x1, y1, 0), '*', color);
         }
     }
 }
@@ -82,7 +84,7 @@ void Pipeline::drawTriangle(const glm::vec3 &v0_3,const glm::vec3 &v1_3,const gl
                 const char render_chars[] = {'`','-',':',';','i','c','x','%','#', '#'};
                 glm::vec4 color = applyFragmentShader(triangleVertexAttributes, glm::vec3(w0, w1, w2),  fragmentPos);
                 char c = render_chars[ int(color.x * 9 + 0.5) ];
-                framebuffer.drawChar(fragmentPos, c);
+                framebuffer.drawChar(fragmentPos, c, color);
             }
         }
     }

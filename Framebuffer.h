@@ -10,17 +10,21 @@ class Framebuffer
 {
 private:
     int width, height;
-    std::vector< std::vector<char> >   chars;
+    std::vector< std::vector<char> >   charBuffer;
+    std::vector< std::vector<glm::vec4> > colorBuffer;
     std::vector< std::vector<double> > zBuffer;
+    static void rgb2hsv(glm::vec4 rgb, glm::vec4 &hsv);
 
 public:
     Framebuffer(int width, int height);
 
-    void drawChar(const glm::vec3 &pos, char c);
+    void drawChar(const glm::vec3 &pos, char c, const glm::vec4 &color);
     void render() const;
 
-    void clearChars();
+    void clearCharBuffer();
+    void clearColorBuffer();
     void clearZBuffer();
+    void clearBuffers();
 
     int getWidth() const { return width; }
     int getHeight() const { return height; }
