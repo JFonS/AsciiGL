@@ -34,16 +34,19 @@ public:
     void set(std::string name, glm::mat4 value);
 
     //TO DO: warnings if value not found
-    bool getBool(std::string name);
-    int getInt(std::string name);
-    float getFloat(std::string name);
-    double getDouble(std::string name);
-    glm::vec2 getVec2(std::string name);
-    glm::vec3 getVec3(std::string name);
-    glm::vec4 getVec4(std::string name);
-    glm::mat2 getMat2(std::string name);
-    glm::mat3 getMat3(std::string name);
-    glm::mat4 getMat4(std::string name);
+    bool getBool(std::string name) const;
+    int getInt(std::string name) const;
+    float getFloat(std::string name) const;
+    double getDouble(std::string name) const;
+    glm::vec2 getVec2(std::string name) const;
+    glm::vec3 getVec3(std::string name) const;
+    glm::vec4 getVec4(std::string name) const;
+    glm::mat2 getMat2(std::string name) const;
+    glm::mat3 getMat3(std::string name) const;
+    glm::mat4 getMat4(std::string name) const;
+
+    static void interpolateTriangle(const std::vector<GenericMap> &attributes, const glm::vec3 &ws,
+                                    GenericMap &interpolatedMap);
 };
 
 #endif // GENERICMAP_H

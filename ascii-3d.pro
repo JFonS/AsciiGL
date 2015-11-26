@@ -15,12 +15,16 @@ SOURCES += main.cpp \
     Pipeline.cpp \
     VAO.cpp \
     ShaderProgram.cpp \
-    GenericMap.cpp
+    GenericMap.cpp \
+    FragmentShader.cpp \
+    VertexShader.cpp
 
 HEADERS += \
     Framebuffer.h \
     Pipeline.h \
     VAO.h \
     ShaderProgram.h \
-    GenericMap.h
+    GenericMap.h \
+    FragmentShader.h \
+    VertexShader.h
 

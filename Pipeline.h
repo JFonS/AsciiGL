@@ -4,18 +4,24 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
-#include "VAO.h"
 #include "Framebuffer.h"
+#include "ShaderProgram.h"
 
 class Pipeline
 {
 private:
+    ShaderProgram program;
+
     void  drawLine(const glm::vec2 &p1, const glm::vec2 &p2, VAO &vao, Framebuffer &framebuffer) const;
-    void  drawTriangle(const glm::vec3 &v0_3, const glm::vec3 &v1_3, const glm::vec3 &v2_3, VAO &vao, Framebuffer &framebuffer) const;
+
+    void  drawTriangle(const glm::vec3 &v0_3, const glm::vec3 &v1_3, const glm::vec3 &v2_3,
+                       const std::vector<GenericMap> &vertexAttributes,
+                       Framebuffer &framebuffer) const;
 
     static float edgeFunction(const glm::vec2 &a, const glm::vec2 &b, const glm::vec2 &c);
-    glm::vec4 applyVertexShader(VAO &vao, int vertex_index) const;
-    char applyCharShader(VAO &vao, const glm::vec3 &fragment) const;
+
+    glm::vec4 applyVertexShader(GenericMap &vertexAttributes, int vertex_index) const;
+    glm::vec4 applyFragmentShader(const std::vector<GenericMap> &vertexAttributes, const glm::vec3 &ws) const;
 
 public:
 
