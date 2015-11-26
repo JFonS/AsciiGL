@@ -13,10 +13,14 @@ LIBS += -lncurses \
 SOURCES += main.cpp \
     Framebuffer.cpp \
     Pipeline.cpp \
-    VAO.cpp
+    VAO.cpp \
+    ShaderProgram.cpp \
+    GenericMap.cpp
 
 HEADERS += \
     Framebuffer.h \
     Pipeline.h \
-    VAO.h
+    VAO.h \
+    ShaderProgram.h \
+    GenericMap.h
 

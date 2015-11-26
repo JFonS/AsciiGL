@@ -123,7 +123,7 @@ int main()
 
     glm::mat4 P = glm::perspective(M_PI/2.0, double(fb.getWidth()) / fb.getHeight(), 2.0, 20.0);
 
-    vao.setMat4("project", P);
+    //vao.setMat4("project", P);
 
     while (true)
     {
@@ -139,7 +139,7 @@ int main()
         M = glm::rotate(M,rotation*1.5f,glm::vec3(0.5,0,1));
         M = glm::scale(M,glm::vec3(4.0));
 
-        vao.setMat4("model", M);
+        //vao.setMat4("model", M);
 
         pl.drawVAO(vao, fb);
         fb.render();
