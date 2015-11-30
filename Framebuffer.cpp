@@ -150,7 +150,36 @@ void Framebuffer::fillColorTable()
   const int hueSize = 32;
   const int satSize = 8;
   //attron(A_REVERSE);
-  for(int hue = 0; hue < hueSize; ++hue)
+  for(float r = 0.0f; r < 1.01f; r += 0.05)
+  {
+    for(float g = 0.0f; g < 1.01f; g += 0.05)
+    {
+      for(float b = 0.0f; b < 1.01f; b += 0.05)
+      {
+        std::pair<int,char> idPair = getColorID(glm::vec4(r,g,b,1));
+        //int id = idPair.first;
+        //if (id != 0)
+        {
+          glm::vec3 roundRGB = glm::vec3(r,g,b)*9.0f;
+          roundRGB = glm::vec3(round(roundRGB.r),round(roundRGB.g),round(roundRGB.b));
+          int id = int(roundRGB.r) + int(roundRGB.g * 10) + int(roundRGB.b * 100);
+          roundRGB = roundRGB/9.0f * 1000.0f;
+          init_color(id, int(roundRGB.r), int(roundRGB.g), int(roundRGB.b));
+          //std::cout << "RGB: " << "(" << rgb.r << ", " << rgb.g << ", " << rgb.b << ")" << std::endl;
+          //std::cout << "HSV: " << "(" << h << ", " << s << ")" << std::endl;
+          //std::cout << id << std::endl;
+          //attron(3);
+          //mvprintw(0, 0, "%f,%f,%f %d", r, g, b, id);
+          //refresh();
+          //getch();
+          //clear();
+          init_pair(id,id,0);
+        }
+      }
+    }
+  }
+
+  /*for(int hue = 0; hue < hueSize; ++hue)
   {
     for(int sat = 0; sat < satSize; ++sat)
     {
@@ -177,14 +206,14 @@ void Framebuffer::fillColorTable()
         //}
       }
     }
-  }
+  }*/
 }
 
-const char render_chars[] = {' ', '`','-',':',';','i','c','x','%','#', '#'};
+const char render_chars[] = {' ', '.','-',':',';','i','c','x','%','#', '#'};
 
 std::pair<int,char> Framebuffer::getColorID(glm::vec4 rgb)
 {
-  if (rgb.r == 0.0f) rgb.r = 0.05f;
+  /*if (rgb.r == 0.0f) rgb.r = 0.05f;
   if (rgb.g == 0.0f) rgb.g = 0.05f;
   if (rgb.b == 0.0f) rgb.b = 0.05f;
   glm::vec4 hsv(0.0f);
@@ -200,7 +229,20 @@ std::pair<int,char> Framebuffer::getColorID(glm::vec4 rgb)
 
   //if (rgb.r == rgb.g && rgb.g == rgb.b) id = 32;
   if (sat == 0) return std::pair<int,char>(8,c);
-  return std::pair<int,char>(id,c);
+  return std::pair<int,char>(id,c);*/
+
+  //float m = glm::max(glm::max(rgb.r,rgb.g),max(m,rgb.b));
+  //glm::vec3 maxRGB = rgb  * (1.0f/m);
+
+
+  int id = int(round(rgb.r*9)) + int(round(rgb.g*9) + 10) + int(round(rgb.b*9)*100);
+  return std::pair<int,char>(int(round(float(id)/999.0f * 255)),'#');
+/*
+  int irri = int(round(rgb.r*6));
+  int gi = int(round(rgb.g*6));
+  int bi = int(round(rgb.b*6));
+  int id = irri*36 + gi*6  + bi;
+*/
 }
 
 
