@@ -146,41 +146,38 @@ int main()
   initscr();
   start_color();
   idcok(stdscr,true);
+
   //*/
-  std::this_thread::sleep_for (std::chrono::milliseconds(2000));
-
   Framebuffer fb(getmaxx(stdscr), getmaxy(stdscr));
-
   //*/
   //attron(A_REVERSE);
-  for(float r = 0.0f; r <= 1.05f; r += 0.1)
+  for(float r = 0.0f; r <= 1.05f; r += 0.2)
   {
-    for(float g = 0.0f; g <= 1.05f; g += 0.1)
+    for(float g = 0.0f; g <= 1.05f; g += 0.2)
     {
-      for(float b = 0.0f; b <= 1.05f; b += 0.1)
+      for(float b = 0.0f; b <= 1.05f; b += 0.2)
       {
         glm::vec4 color(r,g,b,1.0f);
         std::pair<int,char> idPair = Framebuffer::getColorID(color);
         int id = idPair.first;
+        attron(COLOR_PAIR(id));
 
-        //if (id == 247) cout << r << ", " << g << ", " << b << endl;
+        //init_color(250, 1000, 1000, 1000); //per escriure en blanc
+        //init_pair(250, 250, 0); //per escriure en blanc
+        //attron(COLOR_PAIR(250)); //per escriure en blanc
 
-        if (id != 256)  attron(COLOR_PAIR(id));
-        mvprintw(g*10,b*10*15, "%.1f,%.1f,%.1f%3d", r,g,b, id);
-        /*if (b < 0.4) mvprintw(r*10,4*(g*10+100*b),"%3d", id);
-        else if (b < 0.8) mvprintw(r*10+11,4*(g*10+100*(b-0.4)),"%3d", id);
-        else  mvprintw(r*10+22,4*(g*10+100*(b-0.8)),"%3d", id);*/
+        mvprintw(0, 0, "rgb (%.1f,  %.1f,  %.1f) = %d", r, g, b, id);
+        refresh();
+        getch();
+        erase();
       }
     }
-    refresh();
-    getch();
-    erase();
   }
-  refresh();
-  attroff(A_REVERSE);
+ // refresh();
+  //attroff(A_REVERSE);
   //*/
-  getch();
-
+ // getch();
+/*
   Pipeline pl2;
   pl2.program.vertexShader = [](const GenericMap &vertexAttributes, const GenericMap &uniforms, GenericMap &fragmentAttributes) {
     fragmentAttributes.set("color",vertexAttributes.getVec3("color"));
@@ -275,5 +272,6 @@ int main()
   }
 
   getch();
+  */
   endwin();
 }
