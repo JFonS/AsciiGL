@@ -161,15 +161,10 @@ int main()
         std::pair<int,char> idPair = Framebuffer::getColorID(color);
         int id = idPair.first;
         attron(COLOR_PAIR(id));
-
-        //init_color(250, 1000, 1000, 1000); //per escriure en blanc
-        //init_pair(250, 250, 0); //per escriure en blanc
-        //attron(COLOR_PAIR(250)); //per escriure en blanc
-
         mvprintw(0, 0, "rgb (%.1f,  %.1f,  %.1f) = %d", r, g, b, id);
-        refresh();
-        getch();
-        erase();
+        //refresh();
+        //getch();
+        //erase();
       }
     }
   }
@@ -177,7 +172,7 @@ int main()
   //attroff(A_REVERSE);
   //*/
  // getch();
-/*
+
   Pipeline pl2;
   pl2.program.vertexShader = [](const GenericMap &vertexAttributes, const GenericMap &uniforms, GenericMap &fragmentAttributes) {
     fragmentAttributes.set("color",vertexAttributes.getVec3("color"));
@@ -272,6 +267,5 @@ int main()
   }
 
   getch();
-  */
   endwin();
 }

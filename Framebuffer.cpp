@@ -25,16 +25,13 @@ void Framebuffer::render() const
     for(int y = 0; y < height; ++y)
     {
       glm::vec4 color = colorBuffer[x][y];
-      //std::cout << "id->" << colorID << std::endl;
-
       std::pair<int,char> c = getColorID(color);
-      //std::cout << "id->" << colorID << std::endl;
       int id = c.first;
       if (id != 0)
       {
         if (id != lastColorID)
         {
-          wattron(stdscr,COLOR_PAIR(id));
+          attron(COLOR_PAIR(id));
           lastColorID = id;
         }
         mvaddch(y, x, c.second);
@@ -82,15 +79,26 @@ void Framebuffer::fillColorTable()
   init_pair(0,0,0);
 }
 
-const char render_chars[] = {' ', '.','-',':',';','i','c','x','%','#', '#'};
+const char render_chars[] = "$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrft/\|()1{}[]?+!lI;:\"^`'.";
+//const char render_chars[] = {'.','-',':',';','i','c','x','$','#'};
 
 std::pair<int,char> Framebuffer::getColorID(glm::vec4 rgb)
 {
-  rgb.r = round(rgb.r*5)/5; //rgb.r = [0.0, 0.1666, 0.333, ... , 0.83333, 1.0]
-  rgb.g = round(rgb.g*5)/5;
-  rgb.b = round(rgb.b*5)/5;
-  int id = int(round(rgb.r * 5)) + int(round(rgb.g * 30)) + int(round(rgb.b * 180))+1;
-  return std::pair<int,char>(id,'#');
+  float maxVal = std::max(rgb.r, std::max(rgb.g, rgb.b));
+  float mapVal = 1.0/(maxVal + 0.001);
+
+  glm::vec3 newRGB = glm::vec3(rgb.r, rgb.g, rgb.b);
+  newRGB *= mapVal;
+  newRGB.r = round(newRGB.r*5)/5; //newRGB.r = [0.0, 0.1666, 0.333, ... , 0.83333, 1.0]
+  newRGB.g = round(newRGB.g*5)/5;
+  newRGB.b = round(newRGB.b*5)/5;
+
+  int id = int(round(newRGB.r * 5)) + int(round(newRGB.g * 30)) + int(round(newRGB.b * 180))+1;
+
+  maxVal = glm::length(rgb)  / (glm::length(glm::vec3(1,1,1)));
+  char rchar = render_chars[ int(maxVal * sizeof(render_chars)) ];
+
+  return std::pair<int,char>(id, rchar);
 }
 
 
