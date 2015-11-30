@@ -1,15 +1,16 @@
 #include "Framebuffer.h"
+#include <iostream>
 
 Framebuffer::Framebuffer(int width, int height) : width(width), height(height)
 {
+  fillColorTable();
   clearBuffers();
 }
 
-void Framebuffer::drawChar(const glm::vec3 &pos, char c, const glm::vec4 &color)
+void Framebuffer::setPixel(const glm::vec3 &pos, const glm::vec4 &color)
 {
   if(pos.z < zBuffer[pos.x][pos.y])
   {
-    charBuffer[pos.x][pos.y] = c;
     colorBuffer[pos.x][pos.y] = color;
     zBuffer[pos.x][pos.y] = pos.z;
   }
@@ -18,17 +19,26 @@ void Framebuffer::drawChar(const glm::vec3 &pos, char c, const glm::vec4 &color)
 void Framebuffer::render() const
 {
   //clear();
+  int lastColorID = -1;
   for(int x = 0; x < width; ++x)
   {
     for(int y = 0; y < height; ++y)
     {
-      if(charBuffer[x][y] != ' ') {
-        glm::vec4 color = colorBuffer[x][y] * 1000.0f;
-//        init_color(1,int(color.x),int(color.y),int(color.z));
-//        init_pair(1,1, COLOR_BLACK);
-//        wattron(stdscr,COLOR_PAIR(1));
-        mvaddch(y, x, charBuffer[x][y]);
+      glm::vec4 color = colorBuffer[x][y];
+      //std::cout << "id->" << colorID << std::endl;
+
+      std::pair<int,char> c = getColorID(color);
+      //std::cout << "id->" << colorID << std::endl;
+      int id = c.first;
+      if (id != 0){
+        if (id != lastColorID) {
+          wattron(stdscr,COLOR_PAIR(id));
+          lastColorID = id;
+        }
+
+        mvaddch(y, x, c.second);
       }
+
     }
   }
   //refresh();
@@ -36,19 +46,13 @@ void Framebuffer::render() const
 
 void Framebuffer::clearBuffers()
 {
-  clearCharBuffer();
   clearColorBuffer();
   clearZBuffer();
 }
 
-void Framebuffer::clearCharBuffer()
-{
-  charBuffer   = std::vector< std::vector<char> >(width, std::vector<char>(height, ' '));
-}
-
 void Framebuffer::clearColorBuffer()
 {
-  colorBuffer   = std::vector< std::vector<glm::vec4> >(width, std::vector<glm::vec4>(height, glm::vec4(1.0f)));
+  colorBuffer   = std::vector< std::vector<glm::vec4> >(width, std::vector<glm::vec4>(height, glm::vec4(0.0f)));
 }
 
 void Framebuffer::clearZBuffer()
@@ -58,6 +62,47 @@ void Framebuffer::clearZBuffer()
 
 void Framebuffer::rgb2hsv(glm::vec4 rgb, glm::vec4 &hsv)
 {
+  // RGB are from 0..1, H is from 0..360, SV from 0..1
+ /* double maxC = rgb.b;
+  if (maxC < rgb.g) maxC = rgb.g;
+  if (maxC < rgb.r) maxC = rgb.r;
+  double minC = rgb.b;
+  if (minC > rgb.g) minC = rgb.g;
+  if (minC > rgb.r) minC = rgb.r;
+
+  double delta = maxC - minC;
+
+  double V = maxC;
+  double S = 0;
+  double H = 0;
+
+  if (delta == 0)
+  {
+    H = 0;
+    S = 0;
+  }
+  else
+  {
+    S = delta / maxC;
+    double dR = 60*(maxC - rgb.r)/delta + 180;
+    double dG = 60*(maxC - rgb.g)/delta + 180;
+    double dB = 60*(maxC - rgb.b)/delta + 180;
+    if (rgb.r == maxC)
+      H = dB - dG;
+    else if (rgb.g == maxC)
+      H = 120 + dR - dB;
+    else
+      H = 240 + dG - dR;
+  }
+
+  if (H<0)
+    H+=360;
+  if (H>=360)
+    H-=360;
+
+  hsv = glm::vec4(float(H), float(S), float(V), 1.0f);
+  */
+
   float K = 0.f;
 
   if (rgb.g < rgb.b)
@@ -73,29 +118,89 @@ void Framebuffer::rgb2hsv(glm::vec4 rgb, glm::vec4 &hsv)
   }
 
   float chroma = rgb.r - std::min(rgb.g, rgb.b);
-  hsv.x = fabs(K + (rgb.g - rgb.b) / (6.f * chroma + 1e-20f));
+  hsv.x = fabs(K + (rgb.g - rgb.b) / (6.f * chroma + 1e-20f)) * 360.0;
   hsv.y = chroma / (rgb.r + 1e-20f);
   hsv.z = rgb.r;
+
 }
 
-/*void hsv2rgb(glm::vec4 hsv, glm::vec4 &rgb)
+void Framebuffer::hsv2rgb(glm::vec4 hsv, glm::vec4 &rgb)
 {
-  int h = hsv.x;
-  int s =
-  float saturation = 255 - S;
+  float fC = hsv.z * hsv.y; // Chroma
+  float fHPrime = fmod(hsv.x / 60.0, 6);
+  float fX = fC * (1 - fabs(fmod(fHPrime, 2) - 1));
+  float fM = hsv.z - fC;
 
-  byte r = V * constrain(0.5+cos(radians(H)),0,1);
+  if(0 <= fHPrime && fHPrime < 1) rgb = glm::vec4(fC, fX, 0, 1.0);
+  else if(1 <= fHPrime && fHPrime < 2) rgb = glm::vec4(fX, fC, 0, 1.0);
+  else if(2 <= fHPrime && fHPrime < 3) rgb = glm::vec4(0, fC, fX, 1.0);
+  else if(3 <= fHPrime && fHPrime < 4)  rgb = glm::vec4(0, fX, fC, 1.0);
+  else if(4 <= fHPrime && fHPrime < 5)  rgb = glm::vec4(fX, 0, fC, 1.0);
+  else if(5 <= fHPrime && fHPrime < 6)  rgb = glm::vec4(fC, 0, fX, 1.0);
+  else rgb = glm::vec4(0, 0, 0, 1.0);
+  rgb += glm::vec4(glm::vec3(fM), 0);
+}
 
-  byte g = V * constrain(0.5+cos(radians(H-120)),0,1);
+void Framebuffer::fillColorTable()
+{
+  //TO DO: call only once
+  //if(colorTable.size() > 0) return;
+  init_color(0,0,0,0); //Define 0 as black
+  init_pair(0,0,0);
+  const int hueSize = 32;
+  const int satSize = 8;
+  //attron(A_REVERSE);
+  for(int hue = 0; hue < hueSize; ++hue)
+  {
+    for(int sat = 0; sat < satSize; ++sat)
+    {
+      float h = float(hue)/32;
+      float s = float(sat)/8;
+      glm::vec4 rgb;
+      hsv2rgb(glm::vec4(h*360,s,1.0,1.0), rgb);
 
-  byte b = V * constrain(0.5+cos(radians(H+120)),0,1);
+      std::pair<int,char> idPair = getColorID(rgb);
+      int id = idPair.first;
+      //mvprintw(hue,(sat*4)+50,"%d", id, hue, sat);
 
-  byte white = 0.3*r + 0.59*g + 0.11*b;
+      if (id != 0)
+      {
+        init_color(id, int(round(rgb.r * 1000)), int(round(rgb.g * 1000)), int(round(rgb.b * 1000)));
+        //std::cout << "RGB: " << "(" << rgb.r << ", " << rgb.g << ", " << rgb.b << ")" << std::endl;
+        //std::cout << "HSV: " << "(" << h << ", " << s << ")" << std::endl;
+        //std::cout << id << std::endl;
+        init_pair(id,id,0);
+        //if (sat == 0) {
+          attron(COLOR_PAIR(id));
+          //mvprintw(hue,sat*10, "%f,%f,%f", rgb.r,rgb.g,rgb.b);
+   //       mvprintw(hue,(sat*4)+80,"%3d", id, hue, sat);
+        //}
+      }
+    }
+  }
+}
 
-  R = r + saturation/255 * (white - r);
+const char render_chars[] = {' ', '`','-',':',';','i','c','x','%','#', '#'};
 
-  G = g + saturation/255 * (white - g);
+std::pair<int,char> Framebuffer::getColorID(glm::vec4 rgb)
+{
+  if (rgb.r == 0.0f) rgb.r = 0.05f;
+  if (rgb.g == 0.0f) rgb.g = 0.05f;
+  if (rgb.b == 0.0f) rgb.b = 0.05f;
+  glm::vec4 hsv(0.0f);
+  rgb2hsv(rgb, hsv);
 
-  B = b + saturation/255 * (white - b);
+  int hue = int(round(hsv.x / 360 * 32));
+  int sat = int(round(hsv.y * 8));
+  int id = hue*8  + sat; // - 1 - 8;
 
-}*/
+  if (id > 255) id = 255;
+
+  char c = render_chars[int(round(hsv.z * 10))];
+
+  //if (rgb.r == rgb.g && rgb.g == rgb.b) id = 32;
+  if (sat == 0) return std::pair<int,char>(8,c);
+  return std::pair<int,char>(id,c);
+}
+
+

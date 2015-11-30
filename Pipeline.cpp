@@ -19,7 +19,7 @@ void Pipeline::drawLine(const glm::vec2 &p1, const glm::vec2 &p2, VAO &vao, Fram
     signed char const iy((delta_y > 0) - (delta_y < 0));
     delta_y = std::abs(delta_y) / 2;
 
-    framebuffer.drawChar(glm::vec3(x1, y1, 0), '*', color);
+    framebuffer.setPixel(glm::vec3(x1, y1, 0), color);
 
     if (delta_x >= delta_y)
     {
@@ -33,7 +33,7 @@ void Pipeline::drawLine(const glm::vec2 &p1, const glm::vec2 &p2, VAO &vao, Fram
             }
             error += delta_y;
             x1 += ix;
-            framebuffer.drawChar(glm::vec3(x1, y1, 0), '*', color);
+            framebuffer.setPixel(glm::vec3(x1, y1, 0), color);
         }
     }
     else
@@ -48,7 +48,7 @@ void Pipeline::drawLine(const glm::vec2 &p1, const glm::vec2 &p2, VAO &vao, Fram
             }
             error += delta_x;
             y1 += iy;
-            framebuffer.drawChar(glm::vec3(x1, y1, 0), '*', color);
+            framebuffer.setPixel(glm::vec3(x1, y1, 0), color);
         }
     }
 }
@@ -81,10 +81,10 @@ void Pipeline::drawTriangle(const glm::vec3 &v0_3,const glm::vec3 &v1_3,const gl
                 float z = w0 * v0_3.z + w1 * v1_3.z + w2 * v2_3.z;
                 glm::vec3 fragmentPos(x,y,z);
 
-                const char render_chars[] = {'`','-',':',';','i','c','x','%','#', '#'};
+
                 glm::vec4 color = applyFragmentShader(triangleVertexAttributes, glm::vec3(w0, w1, w2),  fragmentPos);
-                char c = render_chars[ int(color.x * 9 + 0.5) ];
-                framebuffer.drawChar(fragmentPos, c, color);
+                //char c = render_chars[ int((color.x/3+color.y/3+color.z/3) * 9 + 0.5) ];
+                framebuffer.setPixel(fragmentPos, color);
             }
         }
     }
@@ -108,6 +108,7 @@ glm::vec4 Pipeline::applyFragmentShader(const std::vector<GenericMap> &vertexAtt
 {
     GenericMap fragmentAttributes;
     GenericMap::interpolateTriangle(vertexAttributes, ws, fragmentAttributes);
+
     fragmentAttributes.set("fragmentPos", fragmentPos);
     return program.fragmentShader(fragmentAttributes, program.uniforms);
 }
@@ -119,10 +120,9 @@ void Pipeline::drawVAO(VAO &vao, Framebuffer &framebuffer) const
     std::vector<glm::vec3> vertices;
     static float rotation = 0.0f;
     rotation += 0.15;
-    for (int i = 0; i < vao.vertexAttributes.size(); ++i)
+    for (unsigned int i = 0; i < vao.vertexAttributes.size(); ++i)
     {
         glm::vec4 vertex = applyVertexShader(vao.vertexAttributes[i], i);
-
         //Clip it
         float w = vertex.w;
         if (vertex.x >= -w && vertex.x <= w &&
@@ -148,7 +148,7 @@ void Pipeline::drawVAO(VAO &vao, Framebuffer &framebuffer) const
 
     if (vertices.size() > 1)
     {
-        for (int i = 0; i < vertices.size(); i += 3)
+        for (unsigned int i = 0; i < vertices.size(); i += 3)
         {
             //drawLine(glm::vec2(lines[i]),glm::vec2(lines[i+1]), framebuffer);
             //drawLine(glm::vec2(lines[i+1]),glm::vec2(lines[i+2]), framebuffer);
