@@ -1,7 +1,7 @@
 #include "Framebuffer.h"
 #include <iostream>
 
-char Framebuffer::greyrampChars[] = ".:xh#@"; //;"$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\\|()1{}[]?-_+~<>i!lI;:,\"^`'. ";
+char Framebuffer::greyrampChars[] = " .:xh#@"; //;"$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\\|()1{}[]?-_+~<>i!lI;:,\"^`'. ";
 
 Framebuffer::Framebuffer(int width, int height) : width(width), height(height)
 {
