@@ -49,6 +49,8 @@ public:
 
     static void interpolateTriangle(const std::vector<GenericMap> &attributes, const glm::vec3 &ws,
                                     GenericMap &interpolatedMap);
+    static void interpolateLine(const std::vector<GenericMap>, float w,
+                                GenericMap &interpolatedMap);
 };
 
 #endif // GENERICMAP_H

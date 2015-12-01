@@ -12,7 +12,9 @@ class Pipeline
 private:
     mutable std::vector<GenericMap> fragmentAttributes;
 
-    void  drawLine(const glm::vec2 &p1, const glm::vec2 &p2, VAO &vao, Framebuffer &framebuffer) const;
+    void  drawLine(const glm::vec3 &v0_3,const glm::vec3 &v1_3,
+                   const std::vector<GenericMap> &lineVertexAttributes,
+                   Framebuffer &framebuffer) const;
 
     void  drawTriangle(const glm::vec3 &v0_3, const glm::vec3 &v1_3, const glm::vec3 &v2_3,
                        const std::vector<GenericMap> &triangleVertexAttributes,
@@ -21,7 +23,8 @@ private:
     static float edgeFunction(const glm::vec2 &a, const glm::vec2 &b, const glm::vec2 &c);
 
     glm::vec4 applyVertexShader(const GenericMap &vertexAttributes, int vertex_index) const;
-    glm::vec4 applyFragmentShader(const std::vector<GenericMap> &vertexAttributes, const glm::vec3 &ws,  const glm::vec3 fragmentPos) const;
+    glm::vec4 applyTriangleFragmentShader(const std::vector<GenericMap> &vertexAttributes, const glm::vec3 &ws,  const glm::vec3 fragmentPos) const;
+    glm::vec4 applyLineFragmentShader(const std::vector<GenericMap> &vertexAttributes, float w,  const glm::vec3 fragmentPos) const;
 
 public:
 

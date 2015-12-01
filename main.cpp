@@ -129,6 +129,7 @@ glm::vec4 vshader(const GenericMap &vertexAttributes, const GenericMap &uniforms
   //glm::vec4 pos(v,1.0f);
   //fragmentAttributes.set("color", vertexAttributes.getVec3("color"));
   fragmentAttributes.set("normal", tNormal);
+  fragmentAttributes.set("color", vertexAttributes.getVec3("color"));
   fragmentAttributes.set("position", glm::vec3(pos));
 
   return  pos;
@@ -144,11 +145,11 @@ glm::vec4 fshader(const GenericMap &fragmentAttributes, const GenericMap &unifor
 
   float att = glm::clamp(glm::dot(normal, glm::normalize(lightPos)), 0.0f, 1.0f);
 
-  return glm::vec4(att * uniforms.getVec3("color"), 1);
+  return glm::vec4(att * fragmentAttributes.getVec3("color"), 1);
   //glm::vec4 color = glm::vec4(fragmentAttributes.getVec3("color"), 1.0f);
   //return color;
 
-  //if (fmod(pos.x + 2.0f*sin(pos.y*0.5f), 4.0f) <= 2.0f) return color;
+ // if (fmod(pos.x + 2.0f*sin(pos.y*0.5f), 4.0f) <= 2.0f) return color;
  // else return glm::vec4(uv,1,1);
 }
 
@@ -167,11 +168,33 @@ int main()
 
   std::vector<glm::vec3> pos, normals;
   std::vector<glm::vec2> uvs;
+  std::vector<glm::vec3> colors;
   bool triangles;
   FileReader::ReadOBJ("./boy.obj", pos, uvs, normals, triangles);
+  float minx = 99999, maxx = -99999, miny = 99999, maxy = -99999, minz = 99999, maxz = -99999;
+
+  for(int i = 0; i < pos.size(); ++i)
+  {
+    minx = std::min(minx, pos[i].x);
+    maxx = std::max(maxx, pos[i].x);
+    miny = std::min(miny, pos[i].y);
+    maxy = std::max(maxy, pos[i].y);
+    minz = std::min(minz, pos[i].z);
+    maxz = std::max(maxz, pos[i].z);
+  }
+
+  for(int i = 0; i < pos.size(); ++i)
+  {
+    glm::vec3 color = pos[i];
+    color.x = (color.x - minx) / (maxx - minx);
+    color.y = (color.y - miny) / (maxy - miny);
+    color.z = (color.z - minz) / (maxz - minz);
+    colors.push_back(color);
+  }
 
   VAO vao;
   vao.addVBO("position", pos);
+  vao.addVBO("color", colors);
   vao.addVBO("normals", normals);
   //vao.addVBO("position", cube);
   //vao.addVBO("color", cubeColors);

@@ -100,7 +100,7 @@ void GenericMap::interpolateTriangle(const std::vector<GenericMap> &attributes, 
 
     for (auto &kv : attributes[0].map_int)
     {
-        int i = int(w0 * (kv.second) + w1 * (attributes[1].map_int.at(kv.first)) + w2 * (attributes[2].map_int.at(kv.first)));
+        int i = int(round(w0 * (kv.second) + w1 * (attributes[1].map_int.at(kv.first)) + w2 * (attributes[2].map_int.at(kv.first))));
         interpolatedMap.set(kv.first, i);
     }
 
@@ -149,6 +149,73 @@ void GenericMap::interpolateTriangle(const std::vector<GenericMap> &attributes, 
     for (auto &kv : attributes[0].map_mat4)
     {
         glm::mat4 m = w0 * (kv.second) + w1 * (attributes[1].map_mat4.at(kv.first)) + w2 * (attributes[2].map_mat4.at(kv.first));
+        interpolatedMap.set(kv.first, m);
+    }
+}
+
+void GenericMap::interpolateLine(const std::vector<GenericMap> attributes, float w,
+                                     GenericMap &interpolatedMap)
+{
+    float w0 = 1.0f - w, w1 = w;
+    for (auto &kv : attributes[0].map_bool) //Interpolate bool :)
+    {
+        float b0 = kv.second ? 1.0f : 0.0f;
+        float b1 = attributes[1].map_bool.at(kv.first) ? 1.0f : 0.0f;
+        float b = w * b0 + w1 * b1;
+        interpolatedMap.set(kv.first, b >= 0.5f);
+    }
+
+    for (auto &kv : attributes[0].map_int)
+    {
+        int i = int(round(w0 * (kv.second) + w1 * (attributes[1].map_int.at(kv.first))));
+        interpolatedMap.set(kv.first, i);
+    }
+
+    for (auto &kv : attributes[0].map_float)
+    {
+        float f = w0 * (kv.second) + w1 * (attributes[1].map_float.at(kv.first));
+        interpolatedMap.set(kv.first, f);
+    }
+
+    for (auto &kv : attributes[0].map_double)
+    {
+        double d = w0 * (kv.second) + w1 * (attributes[1].map_double.at(kv.first));
+        interpolatedMap.set(kv.first, d);
+    }
+
+    for (auto &kv : attributes[0].map_vec2)
+    {
+        glm::vec2 v = w0 * (kv.second) + w1 * (attributes[1].map_vec2.at(kv.first));
+        interpolatedMap.set(kv.first, v);
+    }
+
+    for (auto &kv : attributes[0].map_vec3)
+    {
+        glm::vec3 v = w0 * (kv.second) + w1 * (attributes[1].map_vec3.at(kv.first));
+        interpolatedMap.set(kv.first, v);
+    }
+
+    for (auto &kv : attributes[0].map_vec4)
+    {
+        glm::vec4 v = w0 * (kv.second) + w1 * (attributes[1].map_vec4.at(kv.first));
+        interpolatedMap.set(kv.first, v);
+    }
+
+    for (auto &kv : attributes[0].map_mat2)
+    {
+        glm::mat2 m = w0 * (kv.second) + w1 * (attributes[1].map_mat2.at(kv.first));
+        interpolatedMap.set(kv.first, m);
+    }
+
+    for (auto &kv : attributes[0].map_mat3)
+    {
+        glm::mat3 m = w0 * (kv.second) + w1 * (attributes[1].map_mat3.at(kv.first));
+        interpolatedMap.set(kv.first, m);
+    }
+
+    for (auto &kv : attributes[0].map_mat4)
+    {
+        glm::mat4 m = w0 * (kv.second) + w1 * (attributes[1].map_mat4.at(kv.first));
         interpolatedMap.set(kv.first, m);
     }
 }
