@@ -79,10 +79,10 @@ void Framebuffer::fillColorTable()
   init_pair(0,0,0);
 }
 
-const char render_chars[] = "$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrft/\|()1{}[]?+!lI;:\"^`'.";
-//const char render_chars[] = {'.','-',':',';','i','c','x','$','#'};
+const char render_chars[] = "$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\\|()1{}[]?-_+~<>i!lI;:,\"^`'. ";
+//const char render_chars[] = {'.','-',':',';','i','c','x','$','#'};;
 
-std::pair<int,char> Framebuffer::getColorID(glm::vec4 rgb)
+std::pair<int,char> Framebuffer::getColorID(glm::vec4 rgb) //RGB in 0..1
 {
   float maxVal = std::max(rgb.r, std::max(rgb.g, rgb.b));
   float mapVal = 1.0/(maxVal + 0.001);
@@ -95,7 +95,6 @@ std::pair<int,char> Framebuffer::getColorID(glm::vec4 rgb)
 
   int id = int(round(newRGB.r * 5)) + int(round(newRGB.g * 30)) + int(round(newRGB.b * 180))+1;
 
-  maxVal = glm::length(rgb)  / (glm::length(glm::vec3(1,1,1)));
   char rchar = render_chars[ int(maxVal * sizeof(render_chars)) ];
 
   return std::pair<int,char>(id, rchar);
