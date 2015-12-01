@@ -6,10 +6,12 @@
 #include <thread>         // std::this_thread::sleep_for
 #include <chrono>         // std::chrono::seconds
 
+#define GLM_SWIZZLE
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
 #include "Framebuffer.h"
+#include "FileReader.h"
 #include "Pipeline.h"
 #include "VAO.h"
 
@@ -122,23 +124,32 @@ glm::vec4 vshader(const GenericMap &vertexAttributes, const GenericMap &uniforms
 {
   glm::vec3 v = vertexAttributes.getVec3("position");
   glm::vec4 pos = glm::scale(glm::mat4(1.0f), glm::vec3(1,0.6,1))  * uniforms.getMat4("P") * uniforms.getMat4("M") * glm::vec4(v, 1.0f);
+  glm::vec3 tNormal = (uniforms.getMat4("M") * glm::vec4(vertexAttributes.getVec3("normals"), 0.0f)).xyz();
+
   //glm::vec4 pos(v,1.0f);
-  fragmentAttributes.set("color", vertexAttributes.getVec3("color"));
-  //fragmentAttributes.set("pos", pos);
+  //fragmentAttributes.set("color", vertexAttributes.getVec3("color"));
+  fragmentAttributes.set("normal", tNormal);
+  fragmentAttributes.set("position", glm::vec3(pos));
 
   return  pos;
 }
 
 glm::vec4 fshader(const GenericMap &fragmentAttributes, const GenericMap &uniforms)
 {
-
   glm::vec3 pos = fragmentAttributes.getVec3("fragmentPos");
   glm::vec2 uv = glm::vec2(pos.x/uniforms.getInt("screenWidth"),pos.y/uniforms.getInt("screenHeight"));
 
-  glm::vec4 color = glm::vec4(fragmentAttributes.getVec3("color"), 1.0f);
-  return color;
-  if (fmod(pos.x + 2.0f*sin(pos.y*0.5f), 4.0f) <= 2.0f) return color;
-  else return glm::vec4(uv,1,1);
+  glm::vec3 lightPos(0, 1, 1);
+  glm::vec3 normal = glm::normalize(fragmentAttributes.getVec3("normal"));
+
+  float att = glm::clamp(glm::dot(normal, glm::normalize(lightPos)), 0.0f, 1.0f);
+
+  return glm::vec4(att * uniforms.getVec3("color"), 1);
+  //glm::vec4 color = glm::vec4(fragmentAttributes.getVec3("color"), 1.0f);
+  //return color;
+
+  //if (fmod(pos.x + 2.0f*sin(pos.y*0.5f), 4.0f) <= 2.0f) return color;
+ // else return glm::vec4(uv,1,1);
 }
 
 int main()
@@ -147,86 +158,23 @@ int main()
   start_color();
   idcok(stdscr,true);
 
-  //*/
   Framebuffer fb(getmaxx(stdscr), getmaxy(stdscr));
-  //*/
-  //attron(A_REVERSE);
-  for(float r = 0.0f; r <= 1.05f; r += 0.2)
-  {
-    for(float g = 0.0f; g <= 1.05f; g += 0.2)
-    {
-      for(float b = 0.0f; b <= 1.05f; b += 0.2)
-      {
-        glm::vec4 color(r,g,b,1.0f);
-        std::pair<int,char> idPair = Framebuffer::getColorID(color);
-        int id = idPair.first;
-        attron(COLOR_PAIR(id));
-        mvprintw(0, 0, "rgb (%.1f,  %.1f,  %.1f) = %d", r, g, b, id);
-        //refresh();
-        //getch();
-        //erase();
-      }
-    }
-  }
- // refresh();
-  //attroff(A_REVERSE);
-  //*/
- // getch();
-
-  Pipeline pl2;
-  pl2.program.vertexShader = [](const GenericMap &vertexAttributes, const GenericMap &uniforms, GenericMap &fragmentAttributes) {
-    fragmentAttributes.set("color",vertexAttributes.getVec3("color"));
-    return glm::vec4(vertexAttributes.getVec3("position"), 1.0f);
-  };
-
-  pl2.program.fragmentShader = [](const GenericMap &fragmentAttributes, const GenericMap &uniforms) {
-    return glm::vec4(fragmentAttributes.getVec3("color"),1.0);
-  };
-
-  VAO vao2;
-  vector<glm::vec3> triangle =
-  {
-    glm::vec3(-0.5f,0.5f,-0.5f),
-    glm::vec3(0.5f,-0.5f,-0.5f),
-    glm::vec3(0.5f,0.5f,-0.5f),
-
-    glm::vec3(-0.5f,-0.5f,-0.5f),
-    glm::vec3(0.5f,-0.5f,-0.5f),
-    glm::vec3(-0.5f,0.5f,-0.5f)
-
-  };
-
-  vector<glm::vec3> triangleColors =
-  {
-    glm::vec3(0.5f,0.0f,0.0f),
-    glm::vec3(0.3f,0.3f,0.0f),
-    glm::vec3(0.2f,0.0f,0.2f),
-
-    glm::vec3(0.6f,0.3f,0.9f),
-    glm::vec3(0.3f,0.3f,0.0f),
-    glm::vec3(0.5f,0.0f,0.0f)
-  };
-
-  vao2.addVBO("position", triangle);
-  vao2.addVBO("color", triangleColors);
-
-  erase();
   fb.clearBuffers();
-
-  pl2.drawVAO(vao2,fb);
-
-  fb.render();
-
-  refresh();
-  getch();
 
   Pipeline pl;
   pl.program.fragmentShader = fshader;
   pl.program.vertexShader = vshader;
 
+  std::vector<glm::vec3> pos, normals;
+  std::vector<glm::vec2> uvs;
+  bool triangles;
+  FileReader::ReadOBJ("./boy.obj", pos, uvs, normals, triangles);
+
   VAO vao;
-  vao.addVBO("position", cube);
-  vao.addVBO("color", cubeColors);
+  vao.addVBO("position", pos);
+  vao.addVBO("normals", normals);
+  //vao.addVBO("position", cube);
+  //vao.addVBO("color", cubeColors);
 
   float rotation = 0.0f;
 
@@ -235,35 +183,50 @@ int main()
   pl.program.uniforms.set("screenWidth", fb.getWidth());
   pl.program.uniforms.set("screenHeight", fb.getHeight());
 
+  static float trans = 0.0f;
   while (true)
   {
     erase();
     fb.clearBuffers();
 
+    trans += 0.05;
     rotation += 0.005f;
-    glm::mat4 M;
-    M = glm::mat4(1.0f);
-    M = glm::translate(M, glm::vec3(-6,0,-13));
-    M = glm::rotate(M,rotation,glm::vec3(1,1,0.3));
-    M = glm::rotate(M,rotation*1.5f,glm::vec3(0.5,0,1));
+    glm::mat4 M(1.0f);
+    M = glm::translate(M, glm::vec3(-12,-8, ((sin(trans)*0.5+0.5f)*-7)-13));
+    M = glm::rotate(M, rotation*5, glm::vec3(0,1,0));
+    M = glm::rotate(M,3.141592f/2.0f,glm::vec3(-1,0,0));
+    //M = glm::rotate(M,rotation,glm::vec3(1,1,0.3));
+    //M = glm::rotate(M,rotation*1.5f,glm::vec3(0.5,0,1));
     M = glm::scale(M,glm::vec3(2.5));
 
+    pl.program.uniforms.set("color", glm::vec3(1,0.2,0.2));
     pl.program.uniforms.set("M", M);
     pl.drawVAO(vao, fb);
 
     M = glm::mat4(1.0f);
-    M = glm::translate(M, glm::vec3(6,0,-13));
-    M = glm::rotate(M,rotation,glm::vec3(1,1,0.3));
-    M = glm::rotate(M,rotation*1.5f,glm::vec3(0,1,0));
+    M = glm::translate(M, glm::vec3(((sin(trans*10))*3),-8,-13));
+    M = glm::rotate(M, rotation*9, glm::vec3(0,1,0));
+    M = glm::rotate(M,3.141592f/2.0f,glm::vec3(-1,0,0));
     M = glm::scale(M,glm::vec3(2.5));
 
+    pl.program.uniforms.set("color", glm::vec3(0.2,1.0,0.2));
+    pl.program.uniforms.set("M", M);
+    pl.drawVAO(vao, fb);
+
+    M = glm::mat4(1.0f);
+    M = glm::translate(M, glm::vec3(12,-8,-13));
+    M = glm::rotate(M, rotation*14, glm::vec3(0,1,0));
+    M = glm::rotate(M,3.141592f/2.0f,glm::vec3(-1,0,0));
+    M = glm::scale(M,glm::vec3(2.5));
+
+    pl.program.uniforms.set("color", glm::vec3(0.4,0.8,1));
     pl.program.uniforms.set("M", M);
     pl.drawVAO(vao, fb);
 
     fb.render();
 
     refresh();
-    std::this_thread::sleep_for (std::chrono::milliseconds(1));
+    std::this_thread::sleep_for (std::chrono::milliseconds(10));
   }
 
   getch();

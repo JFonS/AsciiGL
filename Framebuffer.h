@@ -6,20 +6,22 @@
 #include <vector>
 #include "glm/glm.hpp"
 
+typedef std::pair<int, char> Fragment; //color_id, value_char
+
 class Framebuffer
 {
 private:
+
+    static char greyrampChars[];
+
     int width, height;
     std::vector< std::vector<glm::vec4> > colorBuffer;
     std::vector< std::vector<double> > zBuffer;
 
-    //0..31 hue tones, 0..7 saturation values.
-    static void fillColorTable();
+    static Fragment getColorID(const glm::vec4 &rgb);
+    static void initializeColor();
 
 public:
-    static std::pair<int,char> getColorID(glm::vec4 rgb);
-    static void rgb2hsv(glm::vec4 rgb, glm::vec4 &hsv);
-    static void hsv2rgb(glm::vec4 hsv, glm::vec4 &rgb);
 
     Framebuffer(int width, int height);
 

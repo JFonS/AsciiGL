@@ -11,7 +11,8 @@ SOURCES += main.cpp \
     Pipeline.cpp \
     VAO.cpp \
     ShaderProgram.cpp \
-    GenericMap.cpp 
+    GenericMap.cpp \ 
+    FileReader.cpp
 
 HEADERS += \
     Framebuffer.h \
@@ -19,4 +20,5 @@ HEADERS += \
     VAO.h \
     ShaderProgram.h \
     GenericMap.h \
+    FileReader.h
 
