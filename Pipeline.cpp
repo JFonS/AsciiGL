@@ -36,7 +36,9 @@ void Pipeline::drawLine(const glm::vec3 &v0_3,const glm::vec3 &v1_3,
       }
       error += delta_y;
       x0 += ix;
-      float w = glm::distance(glm::vec2(x0,y0), glm::vec2(v0_3))/length;
+      float w = glm::clamp(glm::distance(glm::vec2(x0,y0), glm::vec2(v0_3.x,v0_3.y))/(length+1e-20f),0.0f,1.0f);
+
+      //std::cout << x0 << "," << y0 << " -> " << v0_3.x << "," << v0_3.y << "//" << v1_3.x << "," << v1_3.y << "(" << length << ") => " << w << std::endl;
       float z = v0_3.z*(1.0f-w) + v1_3.z * w;
       glm::vec3 pos(x0, y0, z);
       glm::vec4 color = applyLineFragmentShader(lineVertexAttributes,w,pos);
