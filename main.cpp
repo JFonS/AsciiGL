@@ -213,7 +213,7 @@ int main()
     trans += 0.05;
     rotation += 0.005f;
     glm::mat4 M(1.0f);
-    M = glm::translate(M, glm::vec3(-12,-8, ((sin(trans)*0.5+0.5f)*-7)-13));
+    M = glm::translate(M, glm::vec3(-12,-8, ((sin(trans)*0.5+0.5f)*-37)-1));
     M = glm::rotate(M, rotation*5, glm::vec3(0,1,0));
     M = glm::rotate(M,3.141592f/2.0f,glm::vec3(-1,0,0));
     //M = glm::rotate(M,rotation,glm::vec3(1,1,0.3));

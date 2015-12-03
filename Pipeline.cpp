@@ -11,6 +11,9 @@ void Pipeline::drawLine(const glm::vec3 &v0_3,
 {
     float length = glm::distance(v0_3, v1_3);
 
+    int fbWidth = framebuffer.getWidth();
+    int fbHeight = framebuffer.getHeight();
+
     int x0 = round(v0_3.x), y0 = round(v0_3.y);
     int x1 = round(v1_3.x), y1 = round(v1_3.y);
 
@@ -77,16 +80,21 @@ void Pipeline::drawTriangle(const glm::vec3 &v0_3,const
     glm::vec2 v1(v1_3.x, v1_3.y);
     glm::vec2 v2(v2_3.x, v2_3.y);
 
+    int fbWidth = framebuffer.getWidth();
+    int fbHeight = framebuffer.getHeight();
+
     float area = edgeFunction(v0, v1, v2);
-    float minX = std::min(v0.x, std::min(v1.x, v2.x));
-    float maxX = std::max(v0.x, std::max(v1.x, v2.x));
-    float minY = std::min(v0.y, std::min(v1.y, v2.y));
-    float maxY = std::max(v0.y, std::max(v1.y, v2.y));
+    float minX = std::max(0.0f,std::min(v0.x, std::min(v1.x, v2.x)));
+    float maxX = std::min(float(fbWidth-1),std::max(v0.x, std::max(v1.x, v2.x)));
+    float minY = std::max(0.0f,std::min(v0.y, std::min(v1.y, v2.y)));
+    float maxY = std::min(float(fbHeight-1),std::max(v0.y, std::max(v1.y, v2.y)));
 
     for (int x = minX; x <= maxX; x++)
     {
         for (int y = minY; y <= maxY; y++)
         {
+            attron(COLOR_PAIR(0));
+            mvprintw(0,0,"%d,%d",x,y);
             glm::vec2 p(x + 0.5, y + 0.5);
             float w0 = edgeFunction(v1, v2, p);
             float w1 = edgeFunction(v2, v0, p);
@@ -96,11 +104,13 @@ void Pipeline::drawTriangle(const glm::vec3 &v0_3,const
                 w0 /= area; w1 /= area; w2 /= area;
                 float z = w0 * v0_3.z + w1 * v1_3.z + w2 * v2_3.z;
                 glm::vec3 fragmentPos(x,y,z);
-
-
-                glm::vec4 color = applyTriangleFragmentShader(triangleFragmentAttributes, glm::vec3(w0, w1, w2),  fragmentPos);
-                //char c = render_chars[ int((color.x/3+color.y/3+color.z/3) * 9 + 0.5) ];
-                framebuffer.setPixel(fragmentPos, color);
+                mvprintw(1,0,"%s",glm::to_string(fragmentPos).c_str());
+                if (fragmentPos.z <= 1.0f && fragmentPos.z >= 0.0f &&
+                        fragmentPos.x <= fbWidth && fragmentPos.x >= 0.0f &&
+                        fragmentPos.y <= fbHeight && fragmentPos.y >= 0.0f) {
+                    glm::vec4 color = applyTriangleFragmentShader(triangleFragmentAttributes, glm::vec3(w0, w1, w2),  fragmentPos);
+                    framebuffer.setPixel(fragmentPos, color);
+                }
             }
         }
     }
