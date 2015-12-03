@@ -17,8 +17,6 @@
 
 using namespace std;
 
-char render_chars[] = {'.','-',':',';','i','c','x','%','#'};
-
 static const vector<glm::vec3> cube = {
   glm::vec3(-1.0f,-1.0f,-1.0f),//A
   glm::vec3(-1.0f,-1.0f, 1.0f),
@@ -230,7 +228,7 @@ int main()
     M = glm::translate(M, glm::vec3(((sin(trans*10))*3),-8,-13));
     M = glm::rotate(M, rotation*9, glm::vec3(0,1,0));
     M = glm::rotate(M,3.141592f/2.0f,glm::vec3(-1,0,0));
-    M = glm::scale(M,glm::vec3(2.5));
+    M = glm::scale(M,glm::vec3(10.5));
 
     pl.program.uniforms.set("color", glm::vec3(0.2,1.0,0.2));
     pl.program.uniforms.set("M", M);

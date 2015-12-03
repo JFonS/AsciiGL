@@ -32,8 +32,6 @@ public:
     }
 
     //TO DO (V2.0) void removeVBO(std::string name);
-
-    std::vector<glm::vec3> vertices;
 };
 
 #endif // VAO_H
