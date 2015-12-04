@@ -233,7 +233,7 @@ int main()
   getch();
   */
 
-  while (true)
+  for (int i = 0; i < 100; ++i) //while (true)
   {
     erase();
     fb.clearBuffers();
