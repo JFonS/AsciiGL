@@ -24,28 +24,27 @@ private:
 public:
     GenericMap();
 
-    void set(std::string name, bool value);
-    void set(std::string name, int value);
-    void set(std::string name, float value);
-    void set(std::string name, double value);
-    void set(std::string name, glm::vec2 value);
-    void set(std::string name, glm::vec3 value);
-    void set(std::string name, glm::vec4 value);
-    void set(std::string name, glm::mat2 value);
-    void set(std::string name, glm::mat3 value);
-    void set(std::string name, glm::mat4 value);
+    void set(const std::string& name, bool   value);
+    void set(const std::string& name, int    value);
+    void set(const std::string& name, float  value);
+    void set(const std::string& name, double value);
+    void set(const std::string& name, const glm::vec2& value);
+    void set(const std::string& name, const glm::vec3& value);
+    void set(const std::string& name, const glm::vec4& value);
+    void set(const std::string& name, const glm::mat2& value);
+    void set(const std::string& name, const glm::mat3& value);
+    void set(const std::string& name, const glm::mat4& value);
 
-    //TO DO: warnings if value not found
-    bool getBool(std::string name) const;
-    int getInt(std::string name) const;
-    float getFloat(std::string name) const;
-    double getDouble(std::string name) const;
-    glm::vec2 getVec2(std::string name) const;
-    glm::vec3 getVec3(std::string name) const;
-    glm::vec4 getVec4(std::string name) const;
-    glm::mat2 getMat2(std::string name) const;
-    glm::mat3 getMat3(std::string name) const;
-    glm::mat4 getMat4(std::string name) const;
+    bool   getBool  (const std::string& name) const;
+    int    getInt   (const std::string& name) const;
+    float  getFloat (const std::string& name) const;
+    double getDouble(const std::string& name) const;
+    void getVec2(const std::string& name, glm::vec2& vec2) const;
+    void getVec3(const std::string& name, glm::vec3& vec3) const;
+    void getVec4(const std::string& name, glm::vec4& vec4) const;
+    void getMat2(const std::string& name, glm::mat2& mat2) const;
+    void getMat3(const std::string& name, glm::mat3& mat3) const;
+    void getMat4(const std::string& name, glm::mat4& mat4) const;
 
     static void interpolateTriangle(const std::vector<GenericMap> &attributes, const glm::vec3 &ws,
                                     GenericMap &interpolatedMap);

@@ -121,43 +121,46 @@ std::vector<glm::vec3> cubeColors = {
   glm::vec3(0.2f,0.2f,0.0f)
 };
 
+glm::mat4 M, P;
 glm::vec4 vshader(const GenericMap &vertexAttributes, const GenericMap &uniforms, GenericMap &fragmentAttributes)
 {
-  glm::vec3 v = (uniforms.getMat4("M") * glm::vec4(vertexAttributes.getVec3("position"), 1.0f)).xyz();
-  glm::vec3 tNormal = (uniforms.getMat4("M") * glm::vec4(vertexAttributes.getVec3("normals"), 0.0f)).xyz();
+  glm::mat4 M, P;
+  uniforms.getMat4("M", M);
+  uniforms.getMat4("P", P);
 
-  //v += tNormal*0.5f;
+  glm::vec3 pos, normal;
+  vertexAttributes.getVec3("position", pos);
+  vertexAttributes.getVec3("normals", normal);
 
-  glm::vec4 pos = glm::scale(glm::mat4(1.0f), glm::vec3(1,0.6,1))  * uniforms.getMat4("P") * glm::vec4(v, 1.0f);
-  //glm::vec4 pos(v,1.0f);
-  //fragmentAttributes.set("color", vertexAttributes.getVec3("color"));
-  fragmentAttributes.set("uv", vertexAttributes.getVec2("uvs"));
-  fragmentAttributes.set("normal", tNormal);
-  fragmentAttributes.set("color", vertexAttributes.getVec3("color"));
-  fragmentAttributes.set("position", glm::vec3(pos));
-  return  pos;
+  glm::vec4 tPos, tNormal;
+  tPos = (M * glm::vec4(pos, 1));
+  tNormal = (M * glm::vec4(normal, 0));
+
+  glm::vec2 uv; vertexAttributes.getVec2("uvs", uv);
+  fragmentAttributes.set("uv", uv);
+  fragmentAttributes.set("normal", tNormal.xyz());
+  fragmentAttributes.set("position", tPos.xyz());
+  return P * tPos;
 }
 
 Texture texture;
 
 glm::vec4 fshader(const GenericMap &fragmentAttributes, const GenericMap &uniforms)
 {
-  //glm::vec3 pos = fragmentAttributes.getVec3("fragmentPos");
-  //glm::vec2 screenuv = glm::vec2(pos.x/uniforms.getInt("screenWidth"),pos.y/uniforms.getInt("screenHeight"));
-  glm::vec3 lightPos(0, 1, 1);
-  glm::vec3 normal = glm::normalize(fragmentAttributes.getVec3("normal"));
+  glm::vec3 normal;
+  fragmentAttributes.getVec3("normal", normal);
+  normal = glm::normalize(normal);
 
+  glm::vec2 uv;
+  fragmentAttributes.getVec2("uv", uv);
+  uv.y = 1.0f - uv.y;
+
+  glm::vec3 lightPos(0, 1, 1);
   float att = glm::clamp(glm::dot(normal, glm::normalize(lightPos)), 0.0f, 1.0f);
 
-  glm::vec2 uv = fragmentAttributes.getVec2("uv"); uv.y = 1.0f - uv.y;
   glm::vec4 texColor;
   texture.sample(uv.x, uv.y, texColor);
   return glm::vec4(att * texColor.xyz(), 1);
-  //glm::vec4 color = glm::vec4(fragmentAttributes.getVec3("color"), 1.0f);
-  //return color;
-
- // if (fmod(pos.x + 2.0f*sin(pos.y*0.5f), 4.0f) <= 2.0f) return color;
- // else return glm::vec4(uv,1,1);
 }
 
 int main()
@@ -208,9 +211,11 @@ int main()
   float rotation = 0.0f;
 
   glm::mat4 P = glm::perspective(M_PI/3.0, double(fb.getWidth()) / fb.getHeight(), 0.5, 40.0);
+  P = glm::scale(glm::mat4(1.0f), glm::vec3(1,0.6,1)) * P;
   pl.program.uniforms.set("P", P);
   pl.program.uniforms.set("screenWidth", fb.getWidth());
   pl.program.uniforms.set("screenHeight", fb.getHeight());
+
 
   static float trans = 0.0f;
 
@@ -278,7 +283,7 @@ int main()
     fb.render();
 
     refresh();
-    std::this_thread::sleep_for (std::chrono::milliseconds(1));
+    std::this_thread::sleep_for (std::chrono::milliseconds(10));
   }
 
   getch();

@@ -8,8 +8,9 @@
 class Texture
 {
 private:
-  unsigned char* data;
+  std::vector<float> data;
   int components, width, height;
+
 public:
   Texture();
   Texture(int w, int h, int components);
