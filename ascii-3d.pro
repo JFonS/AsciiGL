@@ -12,7 +12,9 @@ SOURCES += main.cpp \
     VAO.cpp \
     ShaderProgram.cpp \
     GenericMap.cpp \ 
-    FileReader.cpp
+    FileReader.cpp \
+    stb_image.cpp \
+    Texture.cpp
 
 HEADERS += \
     Framebuffer.h \
@@ -20,5 +22,10 @@ HEADERS += \
     VAO.h \
     ShaderProgram.h \
     GenericMap.h \
-    FileReader.h
+    FileReader.h \
+    stb_image.h \
+    Texture.h
+
+DISTFILES += \
+    Patricio.obj
 

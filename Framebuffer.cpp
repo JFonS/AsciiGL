@@ -1,7 +1,7 @@
 #include "Framebuffer.h"
 #include <iostream>
 
-char Framebuffer::greyrampChars[] = " .:xh#@"; //;"$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\\|()1{}[]?-_+~<>i!lI;:,\"^`'. ";
+char Framebuffer::greyrampChars[] = " .:xh@#"; //;"$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\\|()1{}[]?-_+~<>i!lI;:,\"^`'. ";
 
 Framebuffer::Framebuffer(int width, int height) : width(width), height(height)
 {
@@ -81,6 +81,7 @@ Fragment Framebuffer::getColorID(const glm::vec4 &rgb) //RGB in 0..1
   float maxVal = std::max(rgb.r, std::max(rgb.g, rgb.b));
   float mapVal = 1.0/(maxVal + 0.001); //The mapped colors must have the max value
 
+  //std::cout << maxVal << std::endl;
   glm::vec3 newRGB = glm::vec3(rgb.r, rgb.g, rgb.b);
   newRGB *= mapVal;
   newRGB.r = round(newRGB.r*5)/5; //newRGB.r = [0.0, 0.2, 0.4, ... , 0.8, 1.0]
@@ -88,7 +89,7 @@ Fragment Framebuffer::getColorID(const glm::vec4 &rgb) //RGB in 0..1
   newRGB.b = round(newRGB.b*5)/5;
 
   int id = int(round(newRGB.r * 5)) + int(round(newRGB.g * 30)) + int(round(newRGB.b * 180))+1;
-  char rchar = greyrampChars[ int(maxVal * (sizeof(greyrampChars)-1)) ];
+  char rchar = greyrampChars[ int(maxVal * (sizeof(greyrampChars)-1.1)) ];
 
   return Fragment(id, rchar);
 }
