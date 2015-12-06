@@ -122,24 +122,27 @@ std::vector<glm::vec3> cubeColors = {
 };
 
 glm::mat4 M, P;
+
+const std::string Ms = "M", Ps = "P", positionS = "position", uvS = "uv", normalS = "normal";
+
 glm::vec4 vshader(const GenericMap &vertexAttributes, const GenericMap &uniforms, GenericMap &fragmentAttributes)
 {
   glm::mat4 M, P;
-  uniforms.getMat4("M", M);
-  uniforms.getMat4("P", P);
+  uniforms.getMat4(Ms, M);
+  uniforms.getMat4(Ps, P);
 
   glm::vec3 pos, normal;
-  vertexAttributes.getVec3("position", pos);
-  vertexAttributes.getVec3("normals", normal);
+  vertexAttributes.getVec3(positionS, pos);
+  vertexAttributes.getVec3(normalS, normal);
 
   glm::vec4 tPos, tNormal;
   tPos = (M * glm::vec4(pos, 1));
   tNormal = (M * glm::vec4(normal, 0));
 
-  glm::vec2 uv; vertexAttributes.getVec2("uvs", uv);
-  fragmentAttributes.set("uv", uv);
-  fragmentAttributes.set("normal", tNormal.xyz());
-  fragmentAttributes.set("position", tPos.xyz());
+  glm::vec2 uv; vertexAttributes.getVec2(uvS, uv);
+  fragmentAttributes.set(uvS, uv);
+  fragmentAttributes.set(normalS, tNormal.xyz());
+  fragmentAttributes.set(positionS, tPos.xyz());
   return P * tPos;
 }
 
@@ -148,11 +151,11 @@ Texture texture;
 glm::vec4 fshader(const GenericMap &fragmentAttributes, const GenericMap &uniforms)
 {
   glm::vec3 normal;
-  fragmentAttributes.getVec3("normal", normal);
+  fragmentAttributes.getVec3(normalS, normal);
   normal = glm::normalize(normal);
 
   glm::vec2 uv;
-  fragmentAttributes.getVec2("uv", uv);
+  fragmentAttributes.getVec2(uvS, uv);
   uv.y = 1.0f - uv.y;
 
   glm::vec3 lightPos(0, 1, 1);
@@ -167,6 +170,7 @@ int main()
 {
   initscr();
   start_color();
+  curs_set(0);
   idcok(stdscr,true);
 
   Framebuffer fb(getmaxx(stdscr), getmaxy(stdscr));
@@ -205,8 +209,8 @@ int main()
   VAO vao;
   vao.addVBO("position", pos);
   vao.addVBO("color", colors);
-  vao.addVBO("normals", normals);
-  vao.addVBO("uvs", uvs);
+  vao.addVBO("normal", normals);
+  vao.addVBO("uv", uvs);
 
   float rotation = 0.0f;
 
@@ -238,8 +242,10 @@ int main()
   getch();
   */
 
-  for (int i = 0; i < 100; ++i) //while (true)
+  for (int i = 0; i < 400; ++i) //while (true)
   {
+    auto frameStart = std::chrono::system_clock::now();
+
     erase();
     fb.clearBuffers();
 
@@ -281,11 +287,13 @@ int main()
     //pl.drawVAO(vao, fb);
 
     fb.render();
-
+    attron(COLOR_PAIR(70));
+    auto frameEnd = std::chrono::system_clock::now();
+    mvprintw(0,0,"%f fps",1000.0f/std::chrono::duration_cast<std::chrono::milliseconds>(frameEnd - frameStart).count());
     refresh();
-    std::this_thread::sleep_for (std::chrono::milliseconds(10));
+
   }
 
-  getch();
+  //getch();
   endwin();
 }
