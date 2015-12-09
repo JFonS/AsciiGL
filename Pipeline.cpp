@@ -93,8 +93,6 @@ void Pipeline::drawTriangle(const glm::vec3 &v0_3,const
     {
         for (int y = minY; y <= maxY; y++)
         {
-            attron(COLOR_PAIR(0));
-            mvprintw(0,0,"%d,%d",x,y);
             glm::vec2 p(x + 0.5, y + 0.5);
             float w0 = edgeFunction(v1, v2, p);
             float w1 = edgeFunction(v2, v0, p);
@@ -104,7 +102,6 @@ void Pipeline::drawTriangle(const glm::vec3 &v0_3,const
                 w0 /= area; w1 /= area; w2 /= area;
                 float z = w0 * v0_3.z + w1 * v1_3.z + w2 * v2_3.z;
                 glm::vec3 fragmentPos(x,y,z);
-                mvprintw(1,0,"%s",glm::to_string(fragmentPos).c_str());
                 if (fragmentPos.z <= 1.0f && fragmentPos.z >= 0.0f &&
                         fragmentPos.x <= fbWidth && fragmentPos.x >= 0.0f &&
                         fragmentPos.y <= fbHeight && fragmentPos.y >= 0.0f) {

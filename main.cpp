@@ -123,13 +123,14 @@ std::vector<glm::vec3> cubeColors = {
 
 glm::mat4 M, P;
 
-const std::string Ms = "M", Ps = "P", positionS = "position", uvS = "uv", normalS = "normal";
+const std::string Ms = "M", Vs = "V", Ps = "P", positionS = "position", uvS = "uv", normalS = "normal";
 
 glm::vec4 vshader(const GenericMap &vertexAttributes, const GenericMap &uniforms, GenericMap &fragmentAttributes)
 {
-  glm::mat4 M, P;
+  glm::mat4 M, P, V;
   uniforms.getMat4(Ms, M);
   uniforms.getMat4(Ps, P);
+  uniforms.getMat4(Vs, V);
 
   glm::vec3 pos, normal;
   vertexAttributes.getVec3(positionS, pos);
@@ -143,7 +144,7 @@ glm::vec4 vshader(const GenericMap &vertexAttributes, const GenericMap &uniforms
   fragmentAttributes.set(uvS, uv);
   fragmentAttributes.set(normalS, tNormal.xyz());
   fragmentAttributes.set(positionS, tPos.xyz());
-  return P * tPos;
+  return P * V * tPos;
 }
 
 Texture texture;
@@ -172,6 +173,8 @@ int main()
   start_color();
   curs_set(0);
   idcok(stdscr,true);
+  nodelay(stdscr, true);
+  //scrollok(stdscr, TRUE);
 
   Framebuffer fb(getmaxx(stdscr), getmaxy(stdscr));
   fb.clearBuffers();
@@ -184,7 +187,7 @@ int main()
   std::vector<glm::vec2> uvs;
   std::vector<glm::vec3> colors;
   bool triangles;
-  FileReader::ReadOBJ("./luigi.obj", pos, uvs, normals, triangles);
+  FileReader::ReadOBJ("./luigi-lowpoly.obj", pos, uvs, normals, triangles);
   float minx = 99999, maxx = -99999, miny = 99999, maxy = -99999, minz = 99999, maxz = -99999;
 
   for(int i = 0; i < pos.size(); ++i)
@@ -222,74 +225,73 @@ int main()
 
 
   static float trans = 0.0f;
+  static float cameraX = 0.0f, cameraZ = 0.0f;
 
   texture.loadFromFile("luigiD.jpg");
-  /*
-  int fbW = fb.getWidth();
-  int fbH = fb.getHeight();
-  cout << fbW << " " << fbH << endl;
-  fb.clearBuffers();
-  for (int i = 0; i < fb.getWidth(); ++i) {
-    for (int j = 0; j < fb.getHeight(); ++j) {
-      glm::vec4 color = t.sample(float(i)/fbW,float(j)/fbH);
-      cout << glm::to_string(glm::vec2(float(i)/fbW,float(j)/fbH)) << " / " << glm::to_string(color) << endl;
-      fb.setPixel(glm::vec3(i,j,1),color);
-    }
-  }
-  fb.render();
-  refresh();
-  getch();
-  getch();
-  */
 
-  for (int i = 0; i < 400; ++i) //while (true)
+  for (int i = 0; i < 10000; ++i) //while (true)
   {
+    //*/
+    attron(COLOR_PAIR(70));
+    int ch = getch();
+    if (ch == 'a') {
+      mvprintw(3,0,"LEFT   ");
+      cameraX += 0.5f;
+    } else if (ch == 'd') {
+      mvprintw(3,0,"RIGHT   ");
+      cameraX -= 0.5f;
+    } else if (ch == 'w') {
+      mvprintw(3,0,"LEFT   ");
+      cameraZ += 0.5f;
+    } else if (ch == 's') {
+      mvprintw(3,0,"RIGHT   ");
+      cameraZ -= 0.5f;
+    } else {
+      mvprintw(3,0,"NONE   ");
+    }
+    //*/
     auto frameStart = std::chrono::system_clock::now();
-
     erase();
     fb.clearBuffers();
+
+
+
+    glm::mat4 V(1.0f);
+    V = glm::lookAt(glm::vec3(cameraX,0,cameraZ),glm::vec3(cameraX,0,cameraZ-20),glm::vec3(0,1,0));
+    pl.program.uniforms.set(Vs, V);
 
     trans += 0.05;
     rotation += 0.005f;
     glm::mat4 M(1.0f);
     M = glm::translate(M, glm::vec3(-12,-8, ((sin(trans)*0.5+0.5f)*-37)-1));
     M = glm::rotate(M, rotation*5, glm::vec3(0,1,0));
-    //M = glm::rotate(M,3.141592f/2.0f,glm::vec3(-1,0,0));
-    //M = glm::rotate(M,rotation,glm::vec3(1,1,0.3));
-    //M = glm::rotate(M,rotation*1.5f,glm::vec3(0.5,0,1));
-    M = glm::scale(M,glm::vec3(2.5));
-    M = glm::translate(M,glm::vec3(-(maxx+minx)/2.0f,-miny,-(maxz+minz)/2.0f));
+    M = glm::scale(M,glm::vec3(0.15));
 
-    pl.program.uniforms.set("color", glm::vec3(1,0.2,0.2));
-    pl.program.uniforms.set("M", M);
+    pl.program.uniforms.set(Ms, M);
     //pl.drawVAO(vao, fb);
 
     M = glm::mat4(1.0f);
     M = glm::translate(M, glm::vec3(((sin(trans*0.5f))*3),-15,-20));
     M = glm::rotate(M, rotation*9, glm::vec3(0,1,0));
-    //M = glm::rotate(M,3.141592f/2.0f,glm::vec3(-1,0,0));
     M = glm::scale(M,glm::vec3(0.2));
-    //M = glm::translate(M,glm::vec3(-(maxx+minx)/2.0f,-miny,-(maxz+minz)/2.0f));
 
-    pl.program.uniforms.set("color", glm::vec3(0.2,1.0,0.2));
-    pl.program.uniforms.set("M", M);
+    pl.program.uniforms.set(Ms, M);
     pl.drawVAO(vao, fb);
 
     M = glm::mat4(1.0f);
     M = glm::translate(M, glm::vec3(12,-8,-13));
     M = glm::rotate(M, rotation*14, glm::vec3(0,1,0));
-    //M = glm::rotate(M,3.141592f/2.0f,glm::vec3(-1,0,0));
-    M = glm::scale(M,glm::vec3(2.5));
-    M = glm::translate(M,glm::vec3(-(maxx+minx)/2.0f,-miny,-(maxz+minz)/2.0f));
+    M = glm::scale(M,glm::vec3(0.2));
 
-    pl.program.uniforms.set("color", glm::vec3(0.4,0.8,1));
-    pl.program.uniforms.set("M", M);
+    pl.program.uniforms.set(Ms, M);
     //pl.drawVAO(vao, fb);
 
     fb.render();
     attron(COLOR_PAIR(70));
     auto frameEnd = std::chrono::system_clock::now();
     mvprintw(0,0,"%f fps",1000.0f/std::chrono::duration_cast<std::chrono::milliseconds>(frameEnd - frameStart).count());
+    mvprintw(1,0,"%f ",cameraX);
+    mvprintw(2,0,"%c", ch);
     refresh();
 
   }

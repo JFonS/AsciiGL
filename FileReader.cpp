@@ -121,13 +121,12 @@ bool FileReader::ReadOBJ(const char *filepath, std::vector<glm::vec3> &vertexPos
     else if(lineHeader == "f")
     {
       int n = triangles ? 3 : 4;
-      n = 4;
+      //n = 4;
       unsigned int index;
       char c;
 
       for (int i = 0; i < n; ++i)
       {
-
         if (i == 3 ) {
           int size = vertexPosIndexes.size();
           int lastPos = vertexPosIndexes[size-1];
