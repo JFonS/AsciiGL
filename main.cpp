@@ -147,8 +147,6 @@ glm::vec4 vshader(const GenericMap &vertexAttributes, const GenericMap &uniforms
   return P * V * tPos;
 }
 
-Texture texture;
-
 glm::vec4 fshader(const GenericMap &fragmentAttributes, const GenericMap &uniforms)
 {
   glm::vec3 normal;
@@ -162,7 +160,8 @@ glm::vec4 fshader(const GenericMap &fragmentAttributes, const GenericMap &unifor
   glm::vec3 lightPos(0, 1, 1);
   float att = glm::clamp(glm::dot(normal, glm::normalize(lightPos)), 0.0f, 1.0f);
 
-  glm::vec4 texColor = texture.sample(uv.x, uv.y);
+  Texture *tex = uniforms.getTexture("tex");
+  glm::vec4 texColor = tex->sample(uv.x, uv.y);
   return glm::vec4(att * texColor.xyz(), 1);
 }
 
@@ -226,7 +225,9 @@ int main()
   static float trans = 0.0f;
   static float cameraX = 0.0f, cameraZ = 0.0f;
 
-  texture.loadFromFile("luigiD.jpg");
+  Texture *texture = new Texture();
+  texture->loadFromFile("luigiD.jpg");
+  pl.program.uniforms.set("tex", texture);
 
   for (int i = 0; i < 10000; ++i) //while (true)
   {
@@ -267,7 +268,7 @@ int main()
     M = glm::scale(M,glm::vec3(0.15));
 
     pl.program.uniforms.set(Ms, M);
-    //pl.drawVAO(vao, fb);
+    pl.drawVAO(vao, fb);
 
     M = glm::mat4(1.0f);
     M = glm::translate(M, glm::vec3(((sin(trans*0.5f))*3),-15,-20));
@@ -283,7 +284,7 @@ int main()
     M = glm::scale(M,glm::vec3(0.2));
 
     pl.program.uniforms.set(Ms, M);
-    //pl.drawVAO(vao, fb);
+    pl.drawVAO(vao, fb);
 
     fb.render();
     attron(COLOR_PAIR(70));

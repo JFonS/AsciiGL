@@ -6,6 +6,7 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include <glm/gtx/string_cast.hpp>
+#include <thread>
 
 #include "Framebuffer.h"
 #include "ShaderProgram.h"
@@ -34,7 +35,7 @@ private:
 
     glm::vec4 applyTriangleFragmentShader(const std::vector<GenericMap> &vertexAttributes, const glm::vec3 &ws,  const glm::vec3 fragmentPos) const;
     glm::vec4 applyLineFragmentShader(const std::vector<GenericMap> &vertexAttributes, float w,  const glm::vec3 fragmentPos) const;
-
+    void drawVAOthread(VAO &vao, Framebuffer &framebuffer, int nThreads, int m) const;
 public:
 
     ShaderProgram program;

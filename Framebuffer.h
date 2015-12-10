@@ -16,8 +16,6 @@ private:
     static char greyrampChars[];
 
     int width, height;
-    //std::vector< std::vector<glm::vec4> > colorBuffer;
-    //std::vector< std::vector<double> > zBuffer;
     Texture colorBuffer;
     Texture zBuffer;
 

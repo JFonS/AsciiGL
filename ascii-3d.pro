@@ -4,7 +4,7 @@ QMAKE_CXXFLAGS += -std=c++11 -O2 -pg
 CONFIG -= app_bundle
 CONFIG -= qt
 
-LIBS += -lncurses
+LIBS += -lncurses -lpthread
 
 SOURCES += main.cpp \
     Framebuffer.cpp \

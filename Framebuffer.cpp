@@ -49,13 +49,11 @@ void Framebuffer::clearBuffers()
 
 void Framebuffer::clearColorBuffer()
 {
-  //colorBuffer = std::vector< std::vector<glm::vec4> >(width, std::vector<glm::vec4>(height, glm::vec4(0.0f)));
   colorBuffer = Texture(width, height, 4);
 }
 
 void Framebuffer::clearZBuffer()
 {
-  //zBuffer = std::vector< std::vector<double> >(width, std::vector<double>(height, 999999.9));
   zBuffer = Texture(width, height, 1, 99999.9f);
 }
 

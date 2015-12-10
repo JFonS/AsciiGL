@@ -5,6 +5,7 @@
 #include <vector>
 #include <iostream>
 
+#include "Texture.h"
 #include "glm/glm.hpp"
 
 class GenericMap
@@ -20,6 +21,7 @@ private:
     std::map<std::string, glm::mat2> map_mat2;
     std::map<std::string, glm::mat3> map_mat3;
     std::map<std::string, glm::mat4> map_mat4;
+    std::map<std::string, Texture*> map_textures;
 
 public:
     GenericMap();
@@ -34,6 +36,7 @@ public:
     void set(const std::string& name, const glm::mat2& value);
     void set(const std::string& name, const glm::mat3& value);
     void set(const std::string& name, const glm::mat4& value);
+    void set(const std::string& name, Texture *texture);
 
     bool   getBool  (const std::string& name) const;
     int    getInt   (const std::string& name) const;
@@ -45,6 +48,7 @@ public:
     void getMat2(const std::string& name, glm::mat2& mat2) const;
     void getMat3(const std::string& name, glm::mat3& mat3) const;
     void getMat4(const std::string& name, glm::mat4& mat4) const;
+    Texture* getTexture(const std::string& name) const;
 
     static void interpolateTriangle(const std::vector<GenericMap> &attributes, const glm::vec3 &ws,
                                     GenericMap &interpolatedMap);

@@ -14,6 +14,7 @@ void GenericMap::set(const std::string& name, const glm::vec4 &value) { map_vec4
 void GenericMap::set(const std::string& name, const glm::mat2 &value) { map_mat2[name] = value; }
 void GenericMap::set(const std::string& name, const glm::mat3 &value) { map_mat3[name] = value; }
 void GenericMap::set(const std::string& name, const glm::mat4 &value) { map_mat4[name] = value; }
+void GenericMap::set(const std::string& name, Texture *texture) { map_textures[name] = texture; }
 
 bool GenericMap::getBool(const std::string&  name) const
 {
@@ -100,6 +101,16 @@ void GenericMap::getMat4(const std::string&  name, glm::mat4& mat4) const
     {
         std::cerr << "WARNING: Mat4 not found: " << name << std::endl;
         mat4 = glm::mat4(1.0f);
+    }
+}
+
+Texture* GenericMap::getTexture(const std::string& name) const
+{
+    if (map_textures.find(name) != map_textures.end()) return map_textures.at(name);
+    else
+    {
+        std::cerr << "WARNING: Texture not found: " << name << std::endl;
+        return nullptr;
     }
 }
 

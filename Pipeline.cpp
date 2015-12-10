@@ -168,12 +168,21 @@ inline void Pipeline::vertexToDeviceCoords(glm::vec4 &v, int w, int h)
 
 void Pipeline::drawVAO(VAO &vao, Framebuffer &framebuffer) const
 {
-    static float rotation = 0.0f;
-    rotation += 0.15;
+    int nThreads = 4;
+    std::thread threads[nThreads];
+    for (int i = 0; i < nThreads; ++i)
+    {
+        threads[i] = std::thread(&Pipeline::drawVAOthread, this, std::ref(vao), std::ref(framebuffer), nThreads, i);
+    }
+    for (int i = 0; i < nThreads; ++i) threads[i].join();
+}
+
+void Pipeline::drawVAOthread(VAO &vao, Framebuffer &framebuffer, int nThreads, int m) const
+{
     int fbWidth = framebuffer.getWidth();
     int fbHeight = framebuffer.getHeight();
 
-    for (unsigned int i = 0; i < vao.vertexAttributes.size(); i += 3)
+    for (unsigned int i = m*3; i < vao.vertexAttributes.size(); i += 3*nThreads)
     {
         GenericMap fragmentAttributes0, fragmentAttributes1, fragmentAttributes2;
         glm::vec4 v0 = applyVertexShader(vao.vertexAttributes[i],   fragmentAttributes0);
@@ -188,10 +197,10 @@ void Pipeline::drawVAO(VAO &vao, Framebuffer &framebuffer) const
 
         std::vector<GenericMap> triangleFragmentAttributes; //The fragment attributes in each of the 3 tri vertices
         triangleFragmentAttributes = {
-                                       fragmentAttributes0,
-                                       fragmentAttributes1,
-                                       fragmentAttributes2
-                                     };
+            fragmentAttributes0,
+            fragmentAttributes1,
+            fragmentAttributes2
+        };
 
         drawTriangle(v0.xyz(), v1.xyz(), v2.xyz(), triangleFragmentAttributes, framebuffer);
     }
