@@ -12,6 +12,8 @@
 
 #include "stb_image.h"
 
+#include "Window.h"
+
 #include "Framebuffer.h"
 #include "FileReader.h"
 #include "Pipeline.h"
@@ -62,14 +64,13 @@ glm::vec4 fshader(const GenericMap &fragmentAttributes, const GenericMap &unifor
 
 int main()
 {
-  initscr();
-  start_color();
-  curs_set(0);
-  idcok(stdscr,true);
-  nodelay(stdscr, true);
-  //scrollok(stdscr, TRUE);
+  Window window(0, 0, Window::getMaxWidth(), Window::getMaxHeight() * 0.9);
+  Window debugWindow(Window::getMaxWidth() * 0.05, Window::getMaxHeight() * 0.9,
+                     Window::getMaxWidth() * 0.9, Window::getMaxHeight() * 0.1);
+  debugWindow.drawBox = true;
+  Window profWindow(15, 10, 20, 12); profWindow.drawBox = true;
 
-  Framebuffer fb(getmaxx(stdscr), getmaxy(stdscr));
+  Framebuffer fb(window.getWidth(), window.getHeight());
   fb.clearBuffers();
 
   Pipeline pl;
@@ -127,29 +128,29 @@ int main()
   for (int i = 0; i < 10000; ++i) //while (true)
   {
     //*/
-    attron(COLOR_PAIR(70));
+    //wattron(window, COLOR_PAIR(70));
+    window.erase();
+    debugWindow.erase();
+    profWindow.erase();
     int ch = getch();
     if (ch == 'a') {
-      mvprintw(3,0,"LEFT   ");
+      profWindow.printf(0,3,"LEFT   ");
       cameraX += 0.5f;
     } else if (ch == 'd') {
-      mvprintw(3,0,"RIGHT   ");
+        profWindow.printf(0,3,"RIGHT   ");
       cameraX -= 0.5f;
     } else if (ch == 'w') {
-      mvprintw(3,0,"LEFT   ");
+        profWindow.printf(0,3,"FORWARD   ");
       cameraZ += 0.5f;
     } else if (ch == 's') {
-      mvprintw(3,0,"RIGHT   ");
+      profWindow.printf(0,3,"BACKWARDS  ");
       cameraZ -= 0.5f;
     } else {
-      mvprintw(3,0,"NONE   ");
+      profWindow.printf(0,3,"NONE   ");
     }
     //*/
     auto frameStart = std::chrono::system_clock::now();
-    erase();
     fb.clearBuffers();
-
-
 
     glm::mat4 V(1.0f);
     V = glm::lookAt(glm::vec3(cameraX,0,cameraZ),glm::vec3(cameraX,0,cameraZ-20),glm::vec3(0,1,0));
@@ -181,14 +182,17 @@ int main()
     pl.program.uniforms.set("M", M);
     pl.drawVAO(vao, fb);
 
-    fb.render();
-    attron(COLOR_PAIR(70));
-    auto frameEnd = std::chrono::system_clock::now();
-    mvprintw(0,0,"%f fps",1000.0f/std::chrono::duration_cast<std::chrono::milliseconds>(frameEnd - frameStart).count());
-    mvprintw(1,0,"%f ",cameraX);
-    mvprintw(2,0,"%c", ch);
-    refresh();
+    window.render(fb);
+    window.display();
 
+    debugWindow.printf(0,0,"WOLOLOO");
+    debugWindow.display();
+
+    auto frameEnd = std::chrono::system_clock::now();
+    profWindow.printf(0,0,"%f fps",1000.0f/std::chrono::duration_cast<std::chrono::milliseconds>(frameEnd - frameStart).count());
+    profWindow.printf(0,1,"%f ",cameraX);
+    profWindow.printf(0,2,"%c", ch);
+    profWindow.display();
   }
 
   //getch();

@@ -18,7 +18,7 @@ void Framebuffer::setPixel(const glm::vec3 &pos, const glm::vec4 &color)
   }
 }
 
-void Framebuffer::render() const
+void Framebuffer::render(WINDOW *win) const
 {
   int lastColorID = -1;
   for(int x = 0; x < width; ++x)
@@ -32,10 +32,11 @@ void Framebuffer::render() const
       {
         if (id != lastColorID)
         {
-          attron(COLOR_PAIR(id));
+          wattron(win, COLOR_PAIR(id));
           lastColorID = id;
         }
-        mvaddch(y, x, c.second);
+        wmove(win, y, x);
+        waddch(win, c.second);
       }
     }
   }

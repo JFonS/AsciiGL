@@ -11,6 +11,8 @@ typedef std::pair<int, char> Fragment; //color_id, value_char
 
 class Framebuffer
 {
+friend class Window;
+
 private:
 
     static char greyrampChars[];
@@ -22,12 +24,13 @@ private:
     static Fragment getColorID(const glm::vec4 &rgb);
     static void initializeColor();
 
+    void render(WINDOW *win) const;
+
 public:
 
     Framebuffer(int width, int height);
 
     void setPixel(const glm::vec3 &pos, const glm::vec4 &color);
-    void render() const;
 
     void clearColorBuffer();
     void clearZBuffer();
