@@ -14,7 +14,8 @@ SOURCES += main.cpp \
     GenericMap.cpp \ 
     FileReader.cpp \
     stb_image.cpp \
-    Texture.cpp
+    Texture.cpp \
+    Window.cpp
 
 HEADERS += \
     Framebuffer.h \
@@ -24,7 +25,8 @@ HEADERS += \
     GenericMap.h \
     FileReader.h \
     stb_image.h \
-    Texture.h
+    Texture.h \
+    Window.h
 
 DISTFILES += \
     Patricio.obj

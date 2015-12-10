@@ -20,141 +20,36 @@
 
 using namespace std;
 
-static const vector<glm::vec3> cube = {
-  glm::vec3(-1.0f,-1.0f,-1.0f),//A
-  glm::vec3(-1.0f,-1.0f, 1.0f),
-  glm::vec3(-1.0f, 1.0f, 1.0f),
-
-  glm::vec3(-1.0f,-1.0f,-1.0f),//A
-  glm::vec3(-1.0f, 1.0f, 1.0f),
-  glm::vec3(-1.0f, 1.0f,-1.0f),
-
-  glm::vec3(1.0f, 1.0f,-1.0f),//B
-  glm::vec3(-1.0f,-1.0f,-1.0f),
-  glm::vec3(-1.0f, 1.0f,-1.0f),
-
-  glm::vec3(1.0f, 1.0f,-1.0f),//B
-  glm::vec3(1.0f,-1.0f,-1.0f),
-  glm::vec3(-1.0f,-1.0f,-1.0f),
-
-  glm::vec3(1.0f,-1.0f, 1.0f),//C
-  glm::vec3(-1.0f,-1.0f,-1.0f),
-  glm::vec3(1.0f,-1.0f,-1.0f),
-
-  glm::vec3(1.0f,-1.0f, 1.0f),//C
-  glm::vec3(-1.0f,-1.0f, 1.0f),
-  glm::vec3(-1.0f,-1.0f,-1.0f),
-
-  glm::vec3(-1.0f, 1.0f, 1.0f),//D
-  glm::vec3(-1.0f,-1.0f, 1.0f),
-  glm::vec3(1.0f,-1.0f, 1.0f),
-
-  glm::vec3(1.0f, 1.0f, 1.0f),//D
-  glm::vec3(-1.0f, 1.0f, 1.0f),
-  glm::vec3(1.0f,-1.0f, 1.0f),
-
-  glm::vec3(1.0f, 1.0f, 1.0f),//E
-  glm::vec3(1.0f,-1.0f,-1.0f),
-  glm::vec3(1.0f, 1.0f,-1.0f),
-
-  glm::vec3(1.0f,-1.0f,-1.0f),//E
-  glm::vec3(1.0f, 1.0f, 1.0f),
-  glm::vec3(1.0f,-1.0f, 1.0f),
-
-  glm::vec3(1.0f, 1.0f, 1.0f),//F
-  glm::vec3(1.0f, 1.0f,-1.0f),
-  glm::vec3(-1.0f, 1.0f,-1.0f),
-
-  glm::vec3(1.0f, 1.0f, 1.0f),//F
-  glm::vec3(-1.0f, 1.0f,-1.0f),
-  glm::vec3(-1.0f, 1.0f, 1.0f)
-};
-
-std::vector<glm::vec3> cubeColors = {
-  glm::vec3(0.5f,0.0f,0.5f),//A
-  glm::vec3(0.5f,0.0f,0.0f),
-  glm::vec3(0.5f,0.0f,0.0f),
-
-  glm::vec3(0.5f,0.0f,0.5f),//A
-  glm::vec3(0.5f,0.0f,0.0f),
-  glm::vec3(0.5f,0.0f,0.5f),
-
-
-  glm::vec3(1.0f,0.0f,0.0f),//B
-  glm::vec3(1.0f,1.0f,0.0f),
-  glm::vec3(1.0f,0.0f,0.0f),
-
-  glm::vec3(1.0f,0.0f,0.0f),//B
-  glm::vec3(1.0f,1.0f,0.0f),
-  glm::vec3(1.0f,1.0f,0.0f),
-
-  glm::vec3(0.0f,1.0f,0.0f),//C
-  glm::vec3(0.0f,1.0f,0.0f),
-  glm::vec3(0.0f,1.0f,0.0f),
-  
-  glm::vec3(0.0f,1.0f,0.0f),//C
-  glm::vec3(0.0f,1.0f,0.0f),
-  glm::vec3(0.0f,1.0f,0.0f),
-
-  glm::vec3(0.2f,0.6f,1.0f),//D
-  glm::vec3(0.2f,0.6f,1.0f),
-  glm::vec3(0.2f,0.6f,1.0f),
-
-  glm::vec3(0.2f,0.6f,1.0f),//D
-  glm::vec3(0.2f,0.6f,1.0f),
-  glm::vec3(0.2f,0.6f,1.0f),
-
-  glm::vec3(0.0f,1.0f,1.0f),//E
-  glm::vec3(0.0f,1.0f,1.0f),
-  glm::vec3(0.0f,1.0f,1.0f),
-
-  glm::vec3(0.0f,1.0f,1.0f),//E
-  glm::vec3(0.0f,1.0f,1.0f),
-  glm::vec3(0.0f,1.0f,1.0f),
-
-  glm::vec3(0.7f,0.0f,0.2f),//F
-  glm::vec3(0.7f,0.0f,0.2f),
-  glm::vec3(0.2f,0.2f,0.0f),
-
-  glm::vec3(0.7f,0.0f,0.2f),//F
-  glm::vec3(0.2f,0.2f,0.0f),
-  glm::vec3(0.2f,0.2f,0.0f)
-};
-
-glm::mat4 M, P;
-
-const std::string Ms = "M", Vs = "V", Ps = "P", positionS = "position", uvS = "uv", normalS = "normal";
-
 glm::vec4 vshader(const GenericMap &vertexAttributes, const GenericMap &uniforms, GenericMap &fragmentAttributes)
 {
   glm::mat4 M, P, V;
-  uniforms.getMat4(Ms, M);
-  uniforms.getMat4(Ps, P);
-  uniforms.getMat4(Vs, V);
+  uniforms.getMat4("M", M);
+  uniforms.getMat4("P", P);
+  uniforms.getMat4("V", V);
 
   glm::vec3 pos, normal;
-  vertexAttributes.getVec3(positionS, pos);
-  vertexAttributes.getVec3(normalS, normal);
+  vertexAttributes.getVec3("position", pos);
+  vertexAttributes.getVec3("normal", normal);
 
   glm::vec4 tPos, tNormal;
   tPos = (M * glm::vec4(pos, 1));
   tNormal = (M * glm::vec4(normal, 0));
 
-  glm::vec2 uv; vertexAttributes.getVec2(uvS, uv);
-  fragmentAttributes.set(uvS, uv);
-  fragmentAttributes.set(normalS, tNormal.xyz());
-  fragmentAttributes.set(positionS, tPos.xyz());
+  glm::vec2 uv; vertexAttributes.getVec2("uv", uv);
+  fragmentAttributes.set("uv", uv);
+  fragmentAttributes.set("normal", tNormal.xyz());
+  fragmentAttributes.set("position", tPos.xyz());
   return P * V * tPos;
 }
 
 glm::vec4 fshader(const GenericMap &fragmentAttributes, const GenericMap &uniforms)
 {
   glm::vec3 normal;
-  fragmentAttributes.getVec3(normalS, normal);
+  fragmentAttributes.getVec3("normal", normal);
   normal = glm::normalize(normal);
 
   glm::vec2 uv;
-  fragmentAttributes.getVec2(uvS, uv);
+  fragmentAttributes.getVec2("uv", uv);
   uv.y = 1.0f - uv.y;
 
   glm::vec3 lightPos(0, 1, 1);
@@ -258,7 +153,7 @@ int main()
 
     glm::mat4 V(1.0f);
     V = glm::lookAt(glm::vec3(cameraX,0,cameraZ),glm::vec3(cameraX,0,cameraZ-20),glm::vec3(0,1,0));
-    pl.program.uniforms.set(Vs, V);
+    pl.program.uniforms.set("V", V);
 
     trans += 0.05;
     rotation += 0.005f;
@@ -267,7 +162,7 @@ int main()
     M = glm::rotate(M, rotation*5, glm::vec3(0,1,0));
     M = glm::scale(M,glm::vec3(0.15));
 
-    pl.program.uniforms.set(Ms, M);
+    pl.program.uniforms.set("M", M);
     pl.drawVAO(vao, fb);
 
     M = glm::mat4(1.0f);
@@ -275,7 +170,7 @@ int main()
     M = glm::rotate(M, rotation*9, glm::vec3(0,1,0));
     M = glm::scale(M,glm::vec3(0.2));
 
-    pl.program.uniforms.set(Ms, M);
+    pl.program.uniforms.set("M", M);
     pl.drawVAO(vao, fb);
 
     M = glm::mat4(1.0f);
@@ -283,7 +178,7 @@ int main()
     M = glm::rotate(M, rotation*14, glm::vec3(0,1,0));
     M = glm::scale(M,glm::vec3(0.2));
 
-    pl.program.uniforms.set(Ms, M);
+    pl.program.uniforms.set("M", M);
     pl.drawVAO(vao, fb);
 
     fb.render();
