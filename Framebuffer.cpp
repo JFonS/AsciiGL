@@ -11,10 +11,10 @@ Framebuffer::Framebuffer(int width, int height) : width(width), height(height)
 
 void Framebuffer::setPixel(const glm::vec3 &pos, const glm::vec4 &color)
 {
-  if(pos.z < zBuffer[pos.x][pos.y])
+  if(pos.z < zBuffer.sample(pos.x, pos.y, 0))
   {
-    colorBuffer[pos.x][pos.y] = color;
-    zBuffer[pos.x][pos.y] = pos.z;
+    colorBuffer.set(int(pos.x), int(pos.y), color);
+    zBuffer.set(int(pos.x), int(pos.y), pos.z);
   }
 }
 
@@ -25,7 +25,7 @@ void Framebuffer::render() const
   {
     for(int y = 0; y < height; ++y)
     {
-      glm::vec4 color = colorBuffer[x][y];
+      glm::vec4 color = colorBuffer.sample(x,y);
       Fragment c = getColorID(color);
       int id = c.first;
       if (id != 0)
@@ -49,12 +49,14 @@ void Framebuffer::clearBuffers()
 
 void Framebuffer::clearColorBuffer()
 {
-  colorBuffer   = std::vector< std::vector<glm::vec4> >(width, std::vector<glm::vec4>(height, glm::vec4(0.0f)));
+  //colorBuffer = std::vector< std::vector<glm::vec4> >(width, std::vector<glm::vec4>(height, glm::vec4(0.0f)));
+  colorBuffer = Texture(width, height, 4);
 }
 
 void Framebuffer::clearZBuffer()
 {
-  zBuffer = std::vector< std::vector<double> >(width, std::vector<double>(height, 999999.9));
+  //zBuffer = std::vector< std::vector<double> >(width, std::vector<double>(height, 999999.9));
+  zBuffer = Texture(width, height, 1, 99999.9f);
 }
 
 void Framebuffer::initializeColor()

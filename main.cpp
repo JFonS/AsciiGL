@@ -162,8 +162,7 @@ glm::vec4 fshader(const GenericMap &fragmentAttributes, const GenericMap &unifor
   glm::vec3 lightPos(0, 1, 1);
   float att = glm::clamp(glm::dot(normal, glm::normalize(lightPos)), 0.0f, 1.0f);
 
-  glm::vec4 texColor;
-  texture.sample(uv.x, uv.y, texColor);
+  glm::vec4 texColor = texture.sample(uv.x, uv.y);
   return glm::vec4(att * texColor.xyz(), 1);
 }
 

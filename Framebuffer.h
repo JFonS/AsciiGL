@@ -4,6 +4,7 @@
 #include <ncurses.h>
 
 #include <vector>
+#include "Texture.h"
 #include "glm/glm.hpp"
 
 typedef std::pair<int, char> Fragment; //color_id, value_char
@@ -15,8 +16,10 @@ private:
     static char greyrampChars[];
 
     int width, height;
-    std::vector< std::vector<glm::vec4> > colorBuffer;
-    std::vector< std::vector<double> > zBuffer;
+    //std::vector< std::vector<glm::vec4> > colorBuffer;
+    //std::vector< std::vector<double> > zBuffer;
+    Texture colorBuffer;
+    Texture zBuffer;
 
     static Fragment getColorID(const glm::vec4 &rgb);
     static void initializeColor();
