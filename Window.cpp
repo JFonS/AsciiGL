@@ -2,8 +2,8 @@
 
 using namespace agl;
 
-int Window::getMaxWidth() { initscr(); return getmaxx(stdscr); }
-int Window::getMaxHeight() { initscr(); return getmaxy(stdscr); }
+int Window::getMaxWidth() { initscr(); return getmaxx(stdscr); }  //TODO: redundant initscr()
+int Window::getMaxHeight() { initscr(); return getmaxy(stdscr); } //TODO: redundant initscr()
 
 Window::Window(int x, int y, int width, int height) : x(x), y(y), width(width), height(height)
 {
@@ -34,7 +34,18 @@ void Window::attrOn(int attr)
 void Window::display()
 {
     if(drawBox) box(window, 0, 0);
-    wrefresh(window);
+
+    //Clip and show the window :S
+    int cx = getClippedX(), cy = getClippedY();
+    int cw = getClippedWidth(), ch = getClippedHeight();
+
+    if(cw > 0 && ch > 0)
+    {
+        mvwin(window, cy, cx);
+        wresize(window, ch, cw);
+
+        wrefresh(window);
+    }
 }
 
 void Window::render(const Framebuffer &fb) const
@@ -56,7 +67,6 @@ void Window::setPos(int x, int y)
 {
     this->x = x;
     this->y = y;
-    mvwin(window, y, x);
 }
 
 void Window::setSize(const glm::vec2& size)
@@ -68,7 +78,6 @@ void Window::setSize(int width, int height)
 {
     this->width = width;
     this->height = height;
-    wresize(window, height, width);
 }
 
 void Window::printf(int x, int y, const char *format, ...)
@@ -80,4 +89,26 @@ void Window::printf(int x, int y, const char *format, ...)
     else wmove(window, y, x);
     vwprintw(window, format, args);
     va_end(args);
+}
+
+int Window::getClippedX()
+{
+    return glm::clamp(x, 0, Window::getMaxWidth());
+}
+
+int Window::getClippedY()
+{
+    return glm::clamp(y, 0, Window::getMaxHeight());
+}
+
+int Window::getClippedWidth()
+{
+    int rx = getClippedX();
+    return glm::clamp(width, 0, Window::getMaxWidth() - rx);
+}
+
+int Window::getClippedHeight()
+{
+    int ry = getClippedY();
+    return glm::clamp(height, 0, Window::getMaxHeight() - ry);
 }
