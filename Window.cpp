@@ -49,22 +49,26 @@ void Window::erase() const
 
 void Window::setPos(const glm::vec2& pos)
 {
-    mvwin(window, pos.y, pos.x);
+    setPos(pos.x, pos.y);
 }
 
 void Window::setPos(int x, int y)
 {
+    this->x = x;
+    this->y = y;
     mvwin(window, y, x);
 }
 
 void Window::setSize(const glm::vec2& size)
 {
-    wresize(window, size.y, size.x);
+    setSize(size.x, size.y);
 }
 
 void Window::setSize(int width, int height)
 {
-     wresize(window, height, width);
+    this->width = width;
+    this->height = height;
+    wresize(window, height, width);
 }
 
 void Window::printf(int x, int y, const char *format, ...)
