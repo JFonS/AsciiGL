@@ -1,5 +1,7 @@
 #include "Window.h"
 
+using namespace agl;
+
 int Window::getMaxWidth() { initscr(); return getmaxx(stdscr); }
 int Window::getMaxHeight() { initscr(); return getmaxy(stdscr); }
 

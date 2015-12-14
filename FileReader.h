@@ -10,21 +10,24 @@
 
 #include "glm/glm.hpp"
 
-class FileReader
+namespace agl 
 {
-private:
-  static void GetOBJFormat(const char *filepath, bool &uvs, bool &normals, bool &triangles);
+	class FileReader
+	{
+	private:
+	  static void GetOBJFormat(const char *filepath, bool &uvs, bool &normals, bool &triangles);
 
-public:
+	public:
 
-  FileReader();
+	  FileReader();
 
-  static bool ReadOBJ(const char *filepath, std::vector<glm::vec3> &vertexPos,
-                      std::vector<glm::vec2> &vertexUvs,
-                      std::vector<glm::vec3> &vertexNormals,
-                      bool &triangles);
+	  static bool ReadOBJ(const char *filepath, std::vector<glm::vec3> &vertexPos,
+	                      std::vector<glm::vec2> &vertexUvs,
+	                      std::vector<glm::vec3> &vertexNormals,
+	                      bool &triangles);
 
-  static unsigned char* ReadImage(const char *filepath, int &components, int &width, int &height);
-};
+	  static unsigned char* ReadImage(const char *filepath, int &components, int &width, int &height);
+	};
+}
 
 #endif // FILEREADER_H

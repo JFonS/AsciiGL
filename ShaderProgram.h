@@ -5,6 +5,9 @@
 #include "GenericMap.h"
 #include <functional>
 
+
+namespace agl 
+{
 class ShaderProgram
 {
 public:
@@ -15,5 +18,6 @@ public:
 
     ShaderProgram();
 };
+}
 
 #endif // SHADERPROGRAM_H

@@ -8,6 +8,8 @@
 #include "Texture.h"
 #include "glm/glm.hpp"
 
+namespace agl 
+{
 class GenericMap
 {
 private:
@@ -55,5 +57,6 @@ public:
     static void interpolateLine(const std::vector<GenericMap>, float w,
                                 GenericMap &interpolatedMap);
 };
+}
 
 #endif // GENERICMAP_H

@@ -9,6 +9,9 @@
 
 #include "glm/glm.hpp"
 
+
+namespace agl {
+
 class Pipeline;
 
 class VAO
@@ -33,5 +36,6 @@ public:
 
     //TO DO (V2.0) void removeVBO(std::string name);
 };
+}
 
 #endif // VAO_H

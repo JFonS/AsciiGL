@@ -11,6 +11,9 @@
 #include "Framebuffer.h"
 #include "ShaderProgram.h"
 
+
+namespace agl 
+{
 class Pipeline
 {
 private:
@@ -39,10 +42,12 @@ private:
 public:
 
     ShaderProgram program;
+    bool wireframe;
 
     Pipeline();
 
     void drawVAO(VAO &vao, Framebuffer &framebuffer) const;
 };
+}
 
 #endif // PIPELINE_H

@@ -1,5 +1,7 @@
 #include "GenericMap.h"
 
+using namespace agl;
+
 GenericMap::GenericMap()
 {
 }

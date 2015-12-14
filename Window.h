@@ -6,6 +6,9 @@
 
 #include "Framebuffer.h"
 
+namespace agl 
+{
+
 class Window
 {
 private:
@@ -39,5 +42,6 @@ public:
     static int getMaxWidth();
     static int getMaxHeight();
 };
+}
 
 #endif // WINDOW_H

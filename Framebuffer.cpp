@@ -1,6 +1,8 @@
 #include "Framebuffer.h"
 #include <iostream>
 
+using namespace agl;
+
 char Framebuffer::greyrampChars[] = ".,:xh@##"; //;"$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\\|()1{}[]?-_+~<>i!lI;:,\"^`'. ";
 
 Framebuffer::Framebuffer(int width, int height) : width(width), height(height)

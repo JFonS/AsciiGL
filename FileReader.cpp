@@ -1,5 +1,6 @@
 #include "FileReader.h"
 
+using namespace agl;
 
 FileReader::FileReader()
 {
@@ -128,7 +129,7 @@ bool FileReader::ReadOBJ(const char *filepath, std::vector<glm::vec3> &vertexPos
       for (int i = 0; i < n; ++i)
       {
         if (i == 3 ) {
-          int size = vertexPosIndexes.size();
+          unsigned int size = vertexPosIndexes.size();
           int lastPos = vertexPosIndexes[size-1];
           int firstPos = vertexPosIndexes[size-3];
           vertexPosIndexes.push_back(firstPos);
@@ -190,14 +191,14 @@ bool FileReader::ReadOBJ(const char *filepath, std::vector<glm::vec3> &vertexPos
     }
   }
 
-  for(int i = 0; i < vertexPosIndexes.size(); ++i)
+  for(unsigned int i = 0; i < vertexPosIndexes.size(); ++i)
   {
     vertexPos.push_back(disorderedVertexPos[vertexPosIndexes[i]-1]);
   }
 
   if(hasUvs)
   {
-    for(int i = 0; i < vertexUvsIndexes.size(); ++i)
+    for(unsigned int i = 0; i < vertexUvsIndexes.size(); ++i)
     {
       vertexUvs.push_back(disorderedVertexUvs[vertexUvsIndexes[i]-1]);
     }
@@ -205,7 +206,7 @@ bool FileReader::ReadOBJ(const char *filepath, std::vector<glm::vec3> &vertexPos
 
   if(hasNormals)
   {
-    for(int i = 0; i < vertexNormIndexes.size(); ++i)
+    for(unsigned int i = 0; i < vertexNormIndexes.size(); ++i)
     {
       vertexNormals.push_back(disorderedVertexNormals[vertexNormIndexes[i]-1]);
     }

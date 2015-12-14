@@ -1,5 +1,7 @@
 #include "Texture.h"
 
+using namespace agl;
+
 Texture::Texture() : components(0), width(0), height(0)
 {}
 

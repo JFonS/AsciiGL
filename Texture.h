@@ -5,6 +5,9 @@
 #include <string>
 #include "FileReader.h"
 
+
+namespace agl 
+{
 class Texture
 {
 private:
@@ -33,5 +36,6 @@ public:
   glm::vec4 sample(float s, float r) const;
   glm::vec4 sample(int x, int y) const;
 };
+}
 
 #endif // TEXTURE_H

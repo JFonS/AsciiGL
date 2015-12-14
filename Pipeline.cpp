@@ -1,18 +1,17 @@
 #include "Pipeline.h"
 
-Pipeline::Pipeline()
+using namespace agl;
+
+Pipeline::Pipeline() : wireframe(false)
 {
 }
 
 void Pipeline::drawLine(const glm::vec3 &v0_3,
-                        const glm::vec3 &v1_3,
-                        const std::vector<GenericMap> &lineVertexAttributes,
-                        Framebuffer &framebuffer) const
+    const glm::vec3 &v1_3,
+    const std::vector<GenericMap> &lineVertexAttributes,
+    Framebuffer &framebuffer) const
 {
     float length = glm::distance(v0_3, v1_3);
-
-    int fbWidth = framebuffer.getWidth();
-    int fbHeight = framebuffer.getHeight();
 
     int x0 = round(v0_3.x), y0 = round(v0_3.y);
     int x1 = round(v1_3.x), y1 = round(v1_3.y);
@@ -71,10 +70,10 @@ void Pipeline::drawLine(const glm::vec3 &v0_3,
 }
 
 void Pipeline::drawTriangle(const glm::vec3 &v0_3,const
-                            glm::vec3 &v1_3,
-                            const glm::vec3 &v2_3,
-                            const std::vector<GenericMap> &triangleFragmentAttributes,
-                            Framebuffer &framebuffer) const
+    glm::vec3 &v1_3,
+    const glm::vec3 &v2_3,
+    const std::vector<GenericMap> &triangleFragmentAttributes,
+    Framebuffer &framebuffer) const
 {
     glm::vec2 v0(v0_3.x, v0_3.y);
     glm::vec2 v1(v1_3.x, v1_3.y);
@@ -103,14 +102,14 @@ void Pipeline::drawTriangle(const glm::vec3 &v0_3,const
                 float z = w0 * v0_3.z + w1 * v1_3.z + w2 * v2_3.z;
                 glm::vec3 fragmentPos(x,y,z);
                 if (fragmentPos.z <= 1.0f && fragmentPos.z >= 0.0f &&
-                        fragmentPos.x <= fbWidth && fragmentPos.x >= 0.0f &&
-                        fragmentPos.y <= fbHeight && fragmentPos.y >= 0.0f) {
+                    fragmentPos.x <= fbWidth && fragmentPos.x >= 0.0f &&
+                    fragmentPos.y <= fbHeight && fragmentPos.y >= 0.0f) {
                     glm::vec4 color = applyTriangleFragmentShader(triangleFragmentAttributes, glm::vec3(w0, w1, w2),  fragmentPos);
-                    framebuffer.setPixel(fragmentPos, color);
-                }
+                framebuffer.setPixel(fragmentPos, color);
             }
         }
     }
+}
 }
 
 float Pipeline::edgeFunction(const glm::vec2 &a, const glm::vec2 &b, const glm::vec2 &c)
@@ -127,8 +126,8 @@ glm::vec4 Pipeline::applyVertexShader(const GenericMap &vertexAttributes,
 }
 
 glm::vec4 Pipeline::applyTriangleFragmentShader(const std::vector<GenericMap> &vertexAttributes,
-                                                const glm::vec3 &ws,
-                                                const glm::vec3 fragmentPos) const
+    const glm::vec3 &ws,
+    const glm::vec3 fragmentPos) const
 {
     GenericMap fragmentAttributes;
     GenericMap::interpolateTriangle(vertexAttributes, ws, fragmentAttributes);
@@ -149,8 +148,8 @@ glm::vec4 Pipeline::applyLineFragmentShader(const std::vector<GenericMap> &verte
 inline bool Pipeline::vertexOutOfViewCube(const glm::vec4 &v)
 {
     return !(v.x >= -v.w && v.x <= v.w &&
-             v.y >= -v.w && v.y <= v.w &&
-             v.z >= -v.w && v.z <= v.w);
+       v.y >= -v.w && v.y <= v.w &&
+       v.z >= -v.w && v.z <= v.w);
 }
 
 
@@ -195,14 +194,35 @@ void Pipeline::drawVAOthread(VAO &vao, Framebuffer &framebuffer, int nThreads, i
         vertexToDeviceCoords(v1, fbWidth, fbHeight);
         vertexToDeviceCoords(v2, fbWidth, fbHeight);
 
-        std::vector<GenericMap> triangleFragmentAttributes; //The fragment attributes in each of the 3 tri vertices
-        triangleFragmentAttributes = {
-            fragmentAttributes0,
-            fragmentAttributes1,
-            fragmentAttributes2
-        };
 
-        drawTriangle(v0.xyz(), v1.xyz(), v2.xyz(), triangleFragmentAttributes, framebuffer);
+        if (this->wireframe) {
+            std::vector<GenericMap> triangleFragmentAttributes; //The fragment attributes in each of the 3 tri vertices
+            triangleFragmentAttributes = {
+                fragmentAttributes0,
+                fragmentAttributes1
+            };
+            drawLine(v0.xyz(),v1.xyz(), triangleFragmentAttributes, framebuffer);
+
+            triangleFragmentAttributes = {
+                fragmentAttributes1,
+                fragmentAttributes2
+            };
+            drawLine(v1.xyz(),v2.xyz(), triangleFragmentAttributes, framebuffer);
+
+            triangleFragmentAttributes = {
+                fragmentAttributes2,
+                fragmentAttributes0
+            };
+            drawLine(v2.xyz(),v0.xyz(), triangleFragmentAttributes, framebuffer);
+        } else {
+            std::vector<GenericMap> triangleFragmentAttributes; //The fragment attributes in each of the 3 tri vertices
+            triangleFragmentAttributes = {
+                fragmentAttributes0,
+                fragmentAttributes1,
+                fragmentAttributes2
+            };
+            drawTriangle(v0.xyz(), v1.xyz(), v2.xyz(), triangleFragmentAttributes, framebuffer);
+        }
     }
 }
 
