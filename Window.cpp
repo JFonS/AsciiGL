@@ -5,7 +5,7 @@ using namespace agl;
 int Window::getMaxWidth() { initscr(); return getmaxx(stdscr); }  //TODO: redundant initscr()
 int Window::getMaxHeight() { initscr(); return getmaxy(stdscr); } //TODO: redundant initscr()
 
-Window::Window(int x, int y, int width, int height) : x(x), y(y), width(width), height(height)
+Window::Window(int x, int y, int width, int height) : x(x), y(y), width(width), height(height), title("")
 {
     initscr();
     start_color();
@@ -31,9 +31,18 @@ void Window::attrOn(int attr)
     wattron(window, attr);
 }
 
+void Window::setTitle(const std::string &newTitle)
+{
+    title = " " + newTitle + " ";
+}
+
 void Window::display()
 {
-    if(drawBox) box(window, 0, 0);
+    if(drawBox) 
+    {
+        box(window, 0, 0);
+        if (title != "") write(2,0, title);
+    }
 
     //Clip and show the window :S
     int cx = getClippedX(), cy = getClippedY();
@@ -89,6 +98,12 @@ void Window::printf(int x, int y, const char *format, ...)
     else wmove(window, y, x);
     vwprintw(window, format, args);
     va_end(args);
+}
+
+void Window::write(int x, int y, std::string str)
+{
+    wmove(window,y,x);
+    wprintw(window,str.c_str());
 }
 
 int Window::getClippedX()
