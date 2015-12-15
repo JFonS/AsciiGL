@@ -8,24 +8,6 @@ Texture::Texture() : components(0), width(0), height(0)
 Texture::Texture(int w, int h, int c, float initialValue) : components(c), width(w), height(h)
 {data = std::vector<float>(height*width * components, initialValue);}
 
-void Texture::loadFromFile(const std::string &filepath)
-{
-  unsigned char *cdata = FileReader::ReadImage(filepath.c_str(), this->components, this->width, this->height);
-
-  //Store in data as 0..1 instead of 0..255
-  data = std::vector<float>(height*width * components, 0.0f);
-  for(int i = 0; i < width; ++i) //Convert from 0..255 to 0..1
-  {
-      for(int j = 0; j < height; ++j)
-      {
-         data[(j*width+i) * components    ] = float(cdata[(j*width+i) * components    ]) / 255;
-         data[(j*width+i) * components + 1] = float(cdata[(j*width+i) * components + 1]) / 255;
-         data[(j*width+i) * components + 2] = float(cdata[(j*width+i) * components + 2]) / 255;
-         data[(j*width+i) * components + 3] = float(cdata[(j*width+i) * components + 3]) / 255;
-      }
-  }
-}
-
 void Texture::set(int x, int y, int component, float value) //set a specific component
 {
     data[(x + y*width)*components  + component] = value;
