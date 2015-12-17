@@ -7,9 +7,9 @@ Pipeline::Pipeline() : wireframe(false)
 }
 
 void Pipeline::drawLine(const glm::vec3 &v0_3,
-    const glm::vec3 &v1_3,
-    const std::vector<GenericMap> &lineVertexAttributes,
-    Framebuffer &framebuffer) const
+                        const glm::vec3 &v1_3,
+                        const std::vector<GenericMap> &lineVertexAttributes,
+                        Framebuffer &framebuffer) const
 {
     float length = glm::distance(v0_3, v1_3);
 
@@ -103,13 +103,14 @@ void Pipeline::drawTriangle(const glm::vec3 &v0_3,const
                 glm::vec3 fragmentPos(x,y,z);
                 if (fragmentPos.z <= 1.0f && fragmentPos.z >= 0.0f &&
                     fragmentPos.x <= fbWidth && fragmentPos.x >= 0.0f &&
-                    fragmentPos.y <= fbHeight && fragmentPos.y >= 0.0f) {
+                    fragmentPos.y <= fbHeight && fragmentPos.y >= 0.0f)
+                {
                     glm::vec4 color = applyTriangleFragmentShader(triangleFragmentAttributes, glm::vec3(w0, w1, w2),  fragmentPos);
-                framebuffer.setPixel(fragmentPos, color);
+                    framebuffer.setPixel(fragmentPos, color);
+                }
             }
         }
     }
-}
 }
 
 float Pipeline::edgeFunction(const glm::vec2 &a, const glm::vec2 &b, const glm::vec2 &c)

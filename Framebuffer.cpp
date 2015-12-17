@@ -5,10 +5,15 @@ using namespace agl;
 
 char Framebuffer::greyrampChars[] = ".,:xh@##"; //;"$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\\|()1{}[]?-_+~<>i!lI;:,\"^`'. ";
 
+Framebuffer::Framebuffer()
+{
+    width = height = 0;
+}
+
 Framebuffer::Framebuffer(int width, int height) : width(width), height(height)
 {
-  clearBuffers();
-  initializeColor();
+  clearBuffers(); //create the colorBuffer and zBuffer textures
+  initializeColor(); //create the ncurses RGB color table
 }
 
 void Framebuffer::setPixel(const glm::vec3 &pos, const glm::vec4 &color)
