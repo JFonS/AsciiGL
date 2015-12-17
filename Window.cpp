@@ -93,17 +93,19 @@ void Window::printf(int x, int y, const char *format, ...)
 {
     va_list args;
     va_start(args, format);
+
     wattron(window, COLOR_PAIR(70));
+
     if(drawBox) wmove(window, y+1, x+1);
     else wmove(window, y, x);
     vwprintw(window, format, args);
+
     va_end(args);
 }
 
-void Window::write(int x, int y, std::string str)
+void Window::write(int x, int y, const std::string &str)
 {
-    wmove(window,y,x);
-    wprintw(window,str.c_str());
+    printf(x, y, str.c_str());
 }
 
 int Window::getClippedX()
